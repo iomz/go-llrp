@@ -6,12 +6,12 @@ import (
 )
 
 const (
-	HEADER_ROAR = 1085
-	HEADER_REN  = 1087
-	HEADER_SRC  = 1027
-	HEADER_SRCR = 1037
-	HEADER_KA   = 1086
-	HEADER_KAA  = 1096
+	H_ROAccessReport = 1085
+	H_ReaderEventNotification  = 1087
+	H_SetReaderConfig  = 1027
+	H_SetReaderConfigResponse = 1037
+	H_Keepalive   = 1086
+	H_KeepaliveAck  = 1096
 )
 
 // Check if error
