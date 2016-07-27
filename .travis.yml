@@ -1,0 +1,10 @@
+language: go
+sudo: required
+dist: trusty
+go:
+  - 1.5
+  - 1.6
+  - tip
+script:
+  - $HOME/gopath/bin/goveralls -repotoken KYCG97MyLlJ33mXN5eG8Rl6F1IafTlXQG
+  - go test -v .
