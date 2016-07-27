@@ -12,7 +12,7 @@ func C1G2PC(hexpc string) []byte {
 		uint8(140),    // 1+uint7(Type=12)
 		uint16(intpc), // PC bits
 	}
-	return Pack(data)
+	return pack(data)
 }
 
 // Generate C1G2ReadOpSpecResult parameter from readData.
@@ -25,7 +25,7 @@ func C1G2ReadOpSpecResult(readData []byte) []byte {
 		uint16(1),   // ReadDataWordCount
 		readData,    // ReadData
 	}
-	return Pack(data)
+	return pack(data)
 }
 
 // Generate ConnectionAttemptEvent parameter.
@@ -35,8 +35,7 @@ func ConnectionAttemptEvent() []byte {
 		uint16(6),   // Length
 		uint16(0),   // Status(Success=0)
 	}
-	return Pack(data)
-	return Pack(data)
+	return pack(data)
 }
 
 // Generate EPCData parameter from its length and epcLength, and epc.
@@ -55,7 +54,7 @@ func EPCData(length int64, epcLengthBits int64, epc []byte) []byte {
 			epc, // EPCData string
 		}
 	}
-	return Pack(data)
+	return pack(data)
 }
 
 // Generate KeepaliveSpec parameter.
@@ -66,7 +65,7 @@ func KeepaliveSpec() []byte {
 		uint8(1),      // KeepaliveTriggerType=Periodic(1)
 		uint32(10000), // TimeInterval=10000
 	}
-	return Pack(data)
+	return pack(data)
 }
 
 // Generate LLRPStatus parameter.
@@ -77,7 +76,7 @@ func LLRPStatus() []byte {
 		uint16(0),   // StatusCode=M_Success(0)
 		uint16(0),   // ErrorDescriptionByteCount=0
 	}
-	return Pack(data)
+	return pack(data)
 }
 
 // Generate PeakRSSI parameter.
@@ -86,7 +85,7 @@ func PeakRSSI() []byte {
 		uint8(134), // 1+uint7(Type=6)
 		uint8(203), // PeakRSSI
 	}
-	return Pack(data)
+	return pack(data)
 }
 
 // Generate ReaderEventNotification parameter.
@@ -101,7 +100,7 @@ func ReaderEventNotificationData() []byte {
 		utcTimeStamp,
 		connectionAttemptEvent,
 	}
-	return Pack(data)
+	return pack(data)
 }
 
 // Generate TagReportData parameter from epcData, peakRSSI, airProtocolTagData, opSpecResult.
@@ -120,7 +119,7 @@ func TagReportData(epcData []byte,
 		airProtocolTagData,
 		opSpecResult,
 	}
-	return Pack(data)
+	return pack(data)
 }
 
 // Generate UTCTimeStamp parameter at the current time.
@@ -131,5 +130,5 @@ func UTCTimeStamp() []byte {
 		uint16(12),  // Length
 		currentTime, // Microseconds
 	}
-	return Pack(data)
+	return pack(data)
 }
