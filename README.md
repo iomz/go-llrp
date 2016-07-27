@@ -1,6 +1,11 @@
 go-llrp
 ==========
 
+
+[![Build Status](https://travis-ci.org/iomz/go-llrp.svg?branch=master)](https://travis-ci.org/iomz/go-llrp)
+[![Coverage Status](https://coveralls.io/repos/iomz/go-llrp/badge.svg?branch=master)](https://coveralls.io/r/iomz/go-llrp?branch=master)
+[![GoDoc](https://godoc.org/github.com/iomz/go-llrp?status.svg)](http://godoc.org/github.com/iomz/go-llrp)
+
 Description
 -----------
 
