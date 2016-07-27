@@ -74,9 +74,23 @@ func TestReaderEventNotificationData(t *testing.T) {
 }
 
 func TestTagReportData(t *testing.T) {
+	var b, out, dummy []byte
+	b = TagReportData(dummy, dummy, dummy, dummy)
+	out = []byte{0, 240}
+	if !bytes.Equal(b[:len(out)], out) {
+		t.Errorf("%v, want %v", b, out)
+	}
+	// TODO: might need content length verifications
 	t.Skip()
 }
 
 func TestUTCTimeStamp(t *testing.T) {
+	var b, out []byte
+	b = UTCTimeStamp()
+	out = []byte{0, 128, 0, 12}
+	if !bytes.Equal(b[:len(out)], out) {
+		t.Errorf("%v, want %v", b, out)
+	}
+	// TODO: might need content length verifications
 	t.Skip()
 }
