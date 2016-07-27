@@ -1,5 +1,10 @@
 package llrp
 
+import (
+	"strconv"
+	"time"
+)
+
 // Generate C1G2PC parameter from hexpc string.
 func C1G2PC(hexpc string) []byte {
 	intpc, _ := strconv.ParseInt(hexpc, 10, 32)
