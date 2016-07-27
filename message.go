@@ -3,7 +3,7 @@ package llrp
 // Generate Keepalive message.
 func Keepalive() []byte {
 	var data = []interface{}{
-		uint16(HEADER_KA), // Rsvd+Ver+Type=62 (KEEPALIVE)
+		uint16(H_Keepalive), // Rsvd+Ver+Type=62 (KEEPALIVE)
 		uint32(10),        // Length
 		uint32(0),         // ID
 	}
@@ -13,7 +13,7 @@ func Keepalive() []byte {
 // Generate KeepaliveAck message.
 func KeepaliveAck() []byte {
 	var data = []interface{}{
-		uint16(HEADER_KAA), // Rsvd+Ver+Type=62 (KEEPALIVE)
+		uint16(H_KeepaliveAck), // Rsvd+Ver+Type=62 (KEEPALIVE)
 		uint32(10),         // Length
 		uint32(0),          // ID
 	}
@@ -25,7 +25,7 @@ func ROAccessReport(tagReportData []byte, messageID int) []byte {
 	roAccessReportLength :=
 		len(tagReportData) + 10 // Rsvd+Ver+Type+Length+ID->80bits=10bytes
 	var data = []interface{}{
-		uint16(HEADER_ROAR),          // Rsvd+Ver+Type=61 (RO_ACCESS_REPORT)
+		uint16(H_ROAccessReport),          // Rsvd+Ver+Type=61 (RO_ACCESS_REPORT)
 		uint32(roAccessReportLength), // Message length
 		uint32(messageID),            // Message ID
 		tagReportData,
@@ -39,7 +39,7 @@ func ReaderEventNotification(messageID int) []byte {
 	readerEventNotificationLength :=
 		len(readerEventNotificationData) + 10 // Rsvd+Ver+Type+Length+ID->80bits=10bytes
 	var data = []interface{}{
-		uint16(HEADER_REN),                    // Rsvd+Ver+Type=63 (READER_EVENT_NOTIFICATION)
+		uint16(H_ReaderEventNotification),                    // Rsvd+Ver+Type=63 (READER_EVENT_NOTIFICATION)
 		uint32(readerEventNotificationLength), // Length
 		uint32(messageID),                     // ID
 		readerEventNotificationData,
@@ -53,7 +53,7 @@ func SetReaderConfig(messageID int) []byte {
 	setReaderConfigLength :=
 		len(keepaliveSpec) + 11 // Rsvd+Ver+Type+Length+ID+R+Rsvd->88bits=11bytes
 	var data = []interface{}{
-		uint16(HEADER_SRC),            // Rsvd+Ver+Type=3 (SET_READER_CONFIG)
+		uint16(H_SetReaderConfig),            // Rsvd+Ver+Type=3 (SET_READER_CONFIG)
 		uint32(setReaderConfigLength), // Length
 		uint32(messageID),             // ID
 		uint8(0),                      // RestoreFactorySetting(no=0)+Rsvd
@@ -68,7 +68,7 @@ func SetReaderConfigResponse() []byte {
 	setReaderConfigResponseLength :=
 		len(llrpStatus) + 10 // Rsvd+Ver+Type+Length+ID+R+Rsvd->80bits=10bytes
 	var data = []interface{}{
-		uint16(HEADER_SRCR),                   // Rsvd+Ver+Type=13 (SET_READER_CONFIG_RESPONSE)
+		uint16(H_SetReaderConfigResponse),                   // Rsvd+Ver+Type=13 (SET_READER_CONFIG_RESPONSE)
 		uint32(setReaderConfigResponseLength), // Length
 		uint32(0), // ID
 		llrpStatus,
