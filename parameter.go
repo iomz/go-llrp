@@ -7,7 +7,7 @@ import (
 
 // Generate C1G2PC parameter from hexpc string.
 func C1G2PC(hexpc string) []byte {
-	intpc, _ := strconv.ParseInt(hexpc, 10, 32)
+	intpc, _ := strconv.ParseInt(hexpc, 16, 32)
 	var data = []interface{}{
 		uint8(140),    // 1+uint7(Type=12)
 		uint16(intpc), // PC bits
