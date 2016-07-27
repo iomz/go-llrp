@@ -21,10 +21,9 @@ func KeepaliveAck() []byte {
 }
 
 // Generate ROAccessReport message.
-func ROAccessReport(tagReportData []byte) []byte {
+func ROAccessReport(tagReportData []byte, messageID int) []byte {
 	roAccessReportLength :=
 		len(tagReportData) + 10 // Rsvd+Ver+Type+Length+ID->80bits=10bytes
-	messageID += 1
 	var data = []interface{}{
 		uint16(HEADER_ROAR),          // Rsvd+Ver+Type=61 (RO_ACCESS_REPORT)
 		uint32(roAccessReportLength), // Message length
@@ -35,11 +34,10 @@ func ROAccessReport(tagReportData []byte) []byte {
 }
 
 // Generate ReaderEventNotification message.
-func ReaderEventNotification() []byte {
+func ReaderEventNotification(messageID int) []byte {
 	readerEventNotificationData := ReaderEventNotificationData()
 	readerEventNotificationLength :=
 		len(readerEventNotificationData) + 10 // Rsvd+Ver+Type+Length+ID->80bits=10bytes
-	messageID += 1
 	var data = []interface{}{
 		uint16(HEADER_REN),                    // Rsvd+Ver+Type=63 (READER_EVENT_NOTIFICATION)
 		uint32(readerEventNotificationLength), // Length
@@ -50,11 +48,10 @@ func ReaderEventNotification() []byte {
 }
 
 // Generate SetReaderConfig message.
-func SetReaderConfig() []byte {
+func SetReaderConfig(messageID int) []byte {
 	keepaliveSpec := KeepaliveSpec()
 	setReaderConfigLength :=
 		len(keepaliveSpec) + 11 // Rsvd+Ver+Type+Length+ID+R+Rsvd->88bits=11bytes
-	messageID += 1
 	var data = []interface{}{
 		uint16(HEADER_SRC),            // Rsvd+Ver+Type=3 (SET_READER_CONFIG)
 		uint32(setReaderConfigLength), // Length
