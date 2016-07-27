@@ -1,0 +1,11 @@
+package llrp
+
+const (
+	HEADER_ROAR = 1085
+	HEADER_REN  = 1087
+	HEADER_SRC  = 1027
+	HEADER_SRCR = 1037
+	HEADER_KA   = 1086
+	HEADER_KAA  = 1096
+)
+
