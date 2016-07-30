@@ -7,7 +7,7 @@ func Keepalive() []byte {
 		uint32(10),        // Length
 		uint32(0),         // ID
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate KeepaliveAck message.
@@ -17,7 +17,7 @@ func KeepaliveAck() []byte {
 		uint32(10),         // Length
 		uint32(0),          // ID
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate ROAccessReport message.
@@ -30,7 +30,7 @@ func ROAccessReport(tagReportData []byte, messageID int) []byte {
 		uint32(messageID),            // Message ID
 		tagReportData,
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate ReaderEventNotification message.
@@ -44,7 +44,7 @@ func ReaderEventNotification(messageID int) []byte {
 		uint32(messageID),                     // ID
 		readerEventNotificationData,
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate SetReaderConfig message.
@@ -59,7 +59,7 @@ func SetReaderConfig(messageID int) []byte {
 		uint8(0),                      // RestoreFactorySetting(no=0)+Rsvd
 		keepaliveSpec,
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate SetReaderConfigResponse message.
@@ -73,5 +73,5 @@ func SetReaderConfigResponse() []byte {
 		uint32(0), // ID
 		llrpStatus,
 	}
-	return pack(data)
+	return Pack(data)
 }

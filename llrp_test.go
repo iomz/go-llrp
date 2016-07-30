@@ -32,7 +32,7 @@ var packtests = []struct {
 func TestPack(t *testing.T) {
 	var b []byte
 	for _, tt := range packtests {
-		b = pack(tt.in)
+		b = Pack(tt.in)
 		if !bytes.Equal(b, tt.out) {
 			t.Errorf("%v => %v, want %v", tt.in, b, tt.out)
 		}

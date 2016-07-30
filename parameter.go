@@ -12,7 +12,7 @@ func C1G2PC(hexpc string) []byte {
 		uint8(140),    // 1+uint7(Type=12)
 		uint16(intpc), // PC bits
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate C1G2ReadOpSpecResult parameter from readData.
@@ -25,7 +25,7 @@ func C1G2ReadOpSpecResult(readData []byte) []byte {
 		uint16(1),   // ReadDataWordCount
 		readData,    // ReadData
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate ConnectionAttemptEvent parameter.
@@ -35,7 +35,7 @@ func ConnectionAttemptEvent() []byte {
 		uint16(6),   // Length
 		uint16(0),   // Status(Success=0)
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate EPCData parameter from its length and epcLength, and epc.
@@ -54,7 +54,7 @@ func EPCData(length int64, epcLengthBits int64, epc []byte) []byte {
 			epc, // EPCData string
 		}
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate KeepaliveSpec parameter.
@@ -65,7 +65,7 @@ func KeepaliveSpec() []byte {
 		uint8(1),      // KeepaliveTriggerType=Periodic(1)
 		uint32(10000), // TimeInterval=10000
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate LLRPStatus parameter.
@@ -76,7 +76,7 @@ func LLRPStatus() []byte {
 		uint16(0),   // StatusCode=M_Success(0)
 		uint16(0),   // ErrorDescriptionByteCount=0
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate PeakRSSI parameter.
@@ -85,7 +85,7 @@ func PeakRSSI() []byte {
 		uint8(134), // 1+uint7(Type=6)
 		uint8(203), // PeakRSSI
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate ReaderEventNotification parameter.
@@ -100,7 +100,7 @@ func ReaderEventNotificationData() []byte {
 		utcTimeStamp,
 		connectionAttemptEvent,
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate TagReportData parameter from epcData, peakRSSI, airProtocolTagData, opSpecResult.
@@ -119,7 +119,7 @@ func TagReportData(epcData []byte,
 		airProtocolTagData,
 		opSpecResult,
 	}
-	return pack(data)
+	return Pack(data)
 }
 
 // Generate UTCTimeStamp parameter at the current time.
@@ -130,5 +130,5 @@ func UTCTimeStamp() []byte {
 		uint16(12),  // Length
 		currentTime, // Microseconds
 	}
-	return pack(data)
+	return Pack(data)
 }
