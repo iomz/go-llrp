@@ -9,7 +9,7 @@ go-llrp
 Description
 -----------
 
-tiny llrp library for simple tag data event streaming
+Tiny llrp library for simple tag data event streaming
 
 Installation
 ------------
@@ -23,7 +23,8 @@ Documentation
 
 API documentation can be found here: http://godoc.org/github.com/iom/go-llrp
 
-Examples can be found under the `./_example` directory
+An example application is [here](https://github.com/iomz/gologir).
+Further examples are being prepared soon.
 
 Author
 ------
