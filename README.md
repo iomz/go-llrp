@@ -21,9 +21,8 @@ This package can be installed with the go get command:
 Documentation
 -------------
 
-API documentation can be found here: http://godoc.org/github.com/iom/go-llrp
-
-An example application is [here](https://github.com/iomz/gologir).
+API documentation can be found [here](http://godoc.org/github.com/iomz/go-llrp)
+and an example application is [here](https://github.com/iomz/gologir).
 Further examples are being prepared soon.
 
 Author
