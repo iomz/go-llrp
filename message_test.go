@@ -36,7 +36,7 @@ func TestROAccessReport(t *testing.T) {
 
 func TestReaderEventNotification(t *testing.T) {
 	var b, out []byte
-	b = ReaderEventNotification(1000)
+	b = ReaderEventNotification(1000, 1470125350)
 	out = []byte{4, 63, 0, 0, 0, 32, 0, 0, 3, 232}
 	if !bytes.Equal(b[:len(out)], out) {
 		t.Errorf("%v, want %v", b, out)

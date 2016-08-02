@@ -2,13 +2,13 @@ package llrp
 
 import (
 	"bytes"
+	"encoding/hex"
 	"testing"
 )
 
 func TestC1G2PC(t *testing.T) {
 	var b, out []byte
-	var dummy = "3000"
-	b = C1G2PC(dummy)
+	b = C1G2PC(12288)
 	out = []byte{140, 48, 0}
 	if !bytes.Equal(b, out) {
 		t.Errorf("%v, want %v", b, out)
@@ -34,7 +34,13 @@ func TestConnectionAttemptEvent(t *testing.T) {
 }
 
 func TestEPCData(t *testing.T) {
-	t.Skip()
+	var b, out []byte
+	epc, _ := hex.DecodeString("302DB319A000004000000003")
+	b = EPCData(18, 96, epc)
+	out = []byte{141, 48, 45, 179, 25, 160, 0, 0, 64, 0, 0, 0, 3}
+	if !bytes.Equal(b, out) {
+		t.Errorf("%v, want %v", b, out)
+	}
 }
 
 func TestKeepaliveSpec(t *testing.T) {
@@ -66,9 +72,9 @@ func TestPeakRSSI(t *testing.T) {
 
 func TestReaderEventNotificationData(t *testing.T) {
 	var b, out []byte
-	b = ReaderEventNotificationData()
-	out = []byte{0, 246, 0, 22, 0, 128, 0, 12, 0, 0, 0, 0, 0}
-	if !bytes.Equal(b[:len(out)], out) {
+	b = ReaderEventNotificationData(1470125350)
+	out = []byte{0, 246, 0, 22, 0, 128, 0, 12, 0, 0, 0, 0, 87, 160, 85, 38, 1, 0, 0, 6, 0, 0}
+	if !bytes.Equal(b, out) {
 		t.Errorf("%v, want %v", b, out)
 	}
 }
@@ -86,11 +92,9 @@ func TestTagReportData(t *testing.T) {
 
 func TestUTCTimeStamp(t *testing.T) {
 	var b, out []byte
-	b = UTCTimeStamp()
-	out = []byte{0, 128, 0, 12}
-	if !bytes.Equal(b[:len(out)], out) {
+	b = UTCTimeStamp(1470125350)
+	out = []byte{0, 128, 0, 12, 0, 0, 0, 0, 87, 160, 85, 38}
+	if !bytes.Equal(b, out) {
 		t.Errorf("%v, want %v", b, out)
 	}
-	// TODO: might need content length verifications
-	t.Skip()
 }

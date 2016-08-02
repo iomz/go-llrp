@@ -1,16 +1,10 @@
 package llrp
 
-import (
-	"strconv"
-	"time"
-)
-
 // Generate C1G2PC parameter from hexpc string.
-func C1G2PC(hexpc string) []byte {
-	intpc, _ := strconv.ParseInt(hexpc, 16, 32)
+func C1G2PC(pc uint16) []byte {
 	var data = []interface{}{
 		uint8(140),    // 1+uint7(Type=12)
-		uint16(intpc), // PC bits
+		pc, // PC bits
 	}
 	return Pack(data)
 }
@@ -39,7 +33,7 @@ func ConnectionAttemptEvent() []byte {
 }
 
 // Generate EPCData parameter from its length and epcLength, and epc.
-func EPCData(length int64, epcLengthBits int64, epc []byte) []byte {
+func EPCData(length uint16, epcLengthBits uint16, epc []byte) []byte {
 	var data []interface{}
 	if epcLengthBits == 96 {
 		data = []interface{}{
@@ -89,8 +83,8 @@ func PeakRSSI() []byte {
 }
 
 // Generate ReaderEventNotification parameter.
-func ReaderEventNotificationData() []byte {
-	utcTimeStamp := UTCTimeStamp()
+func ReaderEventNotificationData(currentTime uint64) []byte {
+	utcTimeStamp := UTCTimeStamp(currentTime)
 	connectionAttemptEvent := ConnectionAttemptEvent()
 	readerEventNotificationDataLength := len(utcTimeStamp) +
 		len(connectionAttemptEvent) + 4 // Rsvd+Type+length=32bits=4bytes
@@ -123,8 +117,7 @@ func TagReportData(epcData []byte,
 }
 
 // Generate UTCTimeStamp parameter at the current time.
-func UTCTimeStamp() []byte {
-	currentTime := uint64(time.Now().UTC().Nanosecond() / 1000)
+func UTCTimeStamp(currentTime uint64) []byte {
 	var data = []interface{}{
 		uint16(128), // Rsvd+Type=128
 		uint16(12),  // Length

@@ -34,8 +34,8 @@ func ROAccessReport(tagReportData []byte, messageID int) []byte {
 }
 
 // Generate ReaderEventNotification message.
-func ReaderEventNotification(messageID int) []byte {
-	readerEventNotificationData := ReaderEventNotificationData()
+func ReaderEventNotification(messageID int, currentTime uint64) []byte {
+	readerEventNotificationData := ReaderEventNotificationData(currentTime)
 	readerEventNotificationLength :=
 		len(readerEventNotificationData) + 10 // Rsvd+Ver+Type+Length+ID->80bits=10bytes
 	var data = []interface{}{
