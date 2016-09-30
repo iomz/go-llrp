@@ -4,6 +4,7 @@ go-llrp
 
 [![Build Status](https://travis-ci.org/iomz/go-llrp.svg?branch=master)](https://travis-ci.org/iomz/go-llrp)
 [![Coverage Status](https://coveralls.io/repos/iomz/go-llrp/badge.svg?branch=master)](https://coveralls.io/github/iomz/go-llrp?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/iomz/go-llrp)](https://goreportcard.com/report/github.com/iomz/go-llrp)
 [![GoDoc](https://godoc.org/github.com/iomz/go-llrp?status.svg)](http://godoc.org/github.com/iomz/go-llrp)
 
 Description
