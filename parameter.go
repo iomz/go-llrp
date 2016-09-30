@@ -3,8 +3,8 @@ package llrp
 // C1G2PC generates C1G2PC parameter from hexpc string.
 func C1G2PC(pc uint16) []byte {
 	var data = []interface{}{
-		uint8(140),    // 1+uint7(Type=12)
-		pc, // PC bits
+		uint8(140), // 1+uint7(Type=12)
+		pc,         // PC bits
 	}
 	return Pack(data)
 }

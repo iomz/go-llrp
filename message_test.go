@@ -60,4 +60,3 @@ func TestSetReaderConfigResponse(t *testing.T) {
 		t.Errorf("%v, want %v", b, out)
 	}
 }
-

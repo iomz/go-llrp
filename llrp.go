@@ -7,12 +7,12 @@ import (
 
 // LLRP header values
 const (
-	ROAccessReportHeader = 1085
-	ReaderEventNotificationHeader  = 1087
-	SetReaderConfigHeader  = 1027
+	ROAccessReportHeader          = 1085
+	ReaderEventNotificationHeader = 1087
+	SetReaderConfigHeader         = 1027
 	SetReaderConfigResponseHeader = 1037
-	KeepaliveHeader   = 1086
-	KeepaliveAckHeader  = 1096
+	KeepaliveHeader               = 1086
+	KeepaliveAckHeader            = 1096
 )
 
 // Check if error
