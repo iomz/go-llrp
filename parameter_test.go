@@ -52,9 +52,9 @@ func TestKeepaliveSpec(t *testing.T) {
 	}
 }
 
-func TestLLRPStatus(t *testing.T) {
+func TestStatus(t *testing.T) {
 	var b, out []byte
-	b = LLRPStatus()
+	b = Status()
 	out = []byte{1, 31, 0, 8, 0, 0, 0, 0}
 	if !bytes.Equal(b, out) {
 		t.Errorf("%v, want %v", b, out)

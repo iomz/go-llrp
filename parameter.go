@@ -1,6 +1,6 @@
 package llrp
 
-// Generate C1G2PC parameter from hexpc string.
+// C1G2PC generates C1G2PC parameter from hexpc string.
 func C1G2PC(pc uint16) []byte {
 	var data = []interface{}{
 		uint8(140),    // 1+uint7(Type=12)
@@ -9,7 +9,7 @@ func C1G2PC(pc uint16) []byte {
 	return Pack(data)
 }
 
-// Generate C1G2ReadOpSpecResult parameter from readData.
+// C1G2ReadOpSpecResult generates C1G2ReadOpSpecResult parameter from readData.
 func C1G2ReadOpSpecResult(readData []byte) []byte {
 	var data = []interface{}{
 		uint16(349), // Rsvd+Type=
@@ -22,7 +22,7 @@ func C1G2ReadOpSpecResult(readData []byte) []byte {
 	return Pack(data)
 }
 
-// Generate ConnectionAttemptEvent parameter.
+// ConnectionAttemptEvent generates ConnectionAttemptEvent parameter.
 func ConnectionAttemptEvent() []byte {
 	var data = []interface{}{
 		uint16(256), // Rsvd+Type=256
@@ -32,7 +32,7 @@ func ConnectionAttemptEvent() []byte {
 	return Pack(data)
 }
 
-// Generate EPCData parameter from its length and epcLength, and epc.
+// EPCData generates EPCData parameter from its length and epcLength, and epc.
 func EPCData(length uint16, epcLengthBits uint16, epc []byte) []byte {
 	var data []interface{}
 	if epcLengthBits == 96 {
@@ -51,7 +51,7 @@ func EPCData(length uint16, epcLengthBits uint16, epc []byte) []byte {
 	return Pack(data)
 }
 
-// Generate KeepaliveSpec parameter.
+// KeepaliveSpec generates KeepaliveSpec parameter.
 func KeepaliveSpec() []byte {
 	var data = []interface{}{
 		uint16(220),   // Rsvd+Type=220
@@ -62,8 +62,8 @@ func KeepaliveSpec() []byte {
 	return Pack(data)
 }
 
-// Generate LLRPStatus parameter.
-func LLRPStatus() []byte {
+// Status generates LLRPStatus parameter.
+func Status() []byte {
 	var data = []interface{}{
 		uint16(287), // Rsvd+Type=287
 		uint16(8),   // Length
@@ -73,7 +73,7 @@ func LLRPStatus() []byte {
 	return Pack(data)
 }
 
-// Generate PeakRSSI parameter.
+// PeakRSSI generates PeakRSSI parameter.
 func PeakRSSI() []byte {
 	var data = []interface{}{
 		uint8(134), // 1+uint7(Type=6)
@@ -82,7 +82,7 @@ func PeakRSSI() []byte {
 	return Pack(data)
 }
 
-// Generate ReaderEventNotification parameter.
+// ReaderEventNotificationData generates ReaderEventNotification parameter.
 func ReaderEventNotificationData(currentTime uint64) []byte {
 	utcTimeStamp := UTCTimeStamp(currentTime)
 	connectionAttemptEvent := ConnectionAttemptEvent()
@@ -97,7 +97,7 @@ func ReaderEventNotificationData(currentTime uint64) []byte {
 	return Pack(data)
 }
 
-// Generate TagReportData parameter from epcData, peakRSSI, airProtocolTagData, opSpecResult.
+// TagReportData generates TagReportData parameter from epcData, peakRSSI, airProtocolTagData, opSpecResult.
 func TagReportData(epcData []byte,
 	peakRSSI []byte,
 	airProtocolTagData []byte,
@@ -116,7 +116,7 @@ func TagReportData(epcData []byte,
 	return Pack(data)
 }
 
-// Generate UTCTimeStamp parameter at the current time.
+// UTCTimeStamp generates UTCTimeStamp parameter at the current time.
 func UTCTimeStamp(currentTime uint64) []byte {
 	var data = []interface{}{
 		uint16(128), // Rsvd+Type=128

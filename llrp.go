@@ -5,13 +5,14 @@ import (
 	"encoding/binary"
 )
 
+// LLRP header values
 const (
-	H_ROAccessReport = 1085
-	H_ReaderEventNotification  = 1087
-	H_SetReaderConfig  = 1027
-	H_SetReaderConfigResponse = 1037
-	H_Keepalive   = 1086
-	H_KeepaliveAck  = 1096
+	ROAccessReportHeader = 1085
+	ReaderEventNotificationHeader  = 1087
+	SetReaderConfigHeader  = 1027
+	SetReaderConfigResponseHeader = 1037
+	KeepaliveHeader   = 1086
+	KeepaliveAckHeader  = 1096
 )
 
 // Check if error
