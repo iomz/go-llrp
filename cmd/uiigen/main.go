@@ -19,19 +19,25 @@ var (
 	// kingpin generate EPC mode
 	epc = app.Command("epc", "Generate an EPC.")
 	// EPC scheme
-	epcScheme                   = epc.Flag("type", "EPC UII type.").Short('t').Default("SGTIN-96").String()
-	epcCompanyPrefix            = epc.Flag("companyPrefix", "Company Prefix for EPC UII.").Short('c').Default("").String()
-	epcFilterValue              = epc.Flag("filterValue", "Filter Value for EPC UII.").Short('f').Default("").String()
-	epcItemReference            = epc.Flag("itemReference", "Item Reference Value for EPC UII.").Short('i').Default("").String()
-	epcExtension                = epc.Flag("extension", "Extension value for EPC UII.").Short('e').Default("").String()
-	epcSerial                   = epc.Flag("serial", "Serial value for EPC UII.").Short('s').Default("").String()
-	epcIndivisualAssetReference = epc.Flag("indivisualAssetReference", "Indivisual Asset Reference value for EPC UII.").Short('a').Default("").String()
-	epcAssetType                = epc.Flag("assetType", "Asset Type for EPC UII.").Short('y').Default("").String()
+	epcScheme                   = epc.Flag("type", "EPC UII type.").Default("SGTIN-96").String()
+	epcCompanyPrefix            = epc.Flag("companyPrefix", "Company Prefix for EPC.").Default("").String()
+	epcFilter              = epc.Flag("filter", "Filter Value for EPC.").Default("").String()
+	epcItemReference            = epc.Flag("itemReference", "Item Reference Value for EPC.").Default("").String()
+	epcExtension                = epc.Flag("extension", "Extension value for EPC.").Default("").String()
+	epcSerial                   = epc.Flag("serial", "Serial value for EPC.").Default("").String()
+	epcIndivisualAssetReference = epc.Flag("indivisualAssetReference", "Indivisual Asset Reference value for EPC.").Default("").String()
+	epcAssetType                = epc.Flag("assetType", "Asset Type for EPC.").Short('y').Default("").String()
 
 	// kingpin generate ISO UII mode
 	iso = app.Command("iso", "Generate an ISO UII.")
+
 	// ISO scheme
-	isoScheme = iso.Flag("scheme", "Scheme for ISO UII.").Short('s').Default("17367").String()
+	isoScheme                      = iso.Flag("scheme", "Scheme for ISO UII.").Default("17365").String()
+	isoApplicationFamilyIdentifier = iso.Flag("applicationFamilyIdentifier", "Application Family Identifier for ISO UII.").Default("A1").String()
+	isoDataIdeintifier             = iso.Flag("dataIdentifier", "Data Identifier for ISO UII.").Default("25S").String()
+	isoIssuingAgencyCode           = iso.Flag("issuingAgencyCode", "Issuing Agency Code for ISO UII.").Default("UN").String()
+	isoCompanyIdentification       = iso.Flag("companyIdentification", "Company Identification for ISO UII.").Default("043325711").String()
+	isoSerialNumber                = iso.Flag("serialNumber", "Serial Number for ISO UII.").Default("MH8031200000000001").String()
 )
 
 // CheckIfStringInSlice checks if string exists in a string slice
@@ -56,13 +62,13 @@ func MakeEPC() string {
 	var uii []byte
 	switch strings.ToUpper(*epcScheme) {
 	case "SGTIN-96":
-		uii, _ = MakeRuneSliceOfSGTIN96(*epcCompanyPrefix, *epcFilterValue, *epcItemReference, *epcSerial)
+		uii, _ = MakeRuneSliceOfSGTIN96(*epcCompanyPrefix, *epcFilter, *epcItemReference, *epcSerial)
 	case "SSCC-96":
-		uii, _ = MakeRuneSliceOfSSCC96(*epcCompanyPrefix, *epcFilterValue, *epcExtension)
+		uii, _ = MakeRuneSliceOfSSCC96(*epcCompanyPrefix, *epcFilter, *epcExtension)
 	case "GRAI-96":
-		uii, _ = MakeRuneSliceOfGRAI96(*epcCompanyPrefix, *epcFilterValue, *epcAssetType, *epcSerial)
+		uii, _ = MakeRuneSliceOfGRAI96(*epcCompanyPrefix, *epcFilter, *epcAssetType, *epcSerial)
 	case "GIAI-96":
-		uii, _ = MakeRuneSliceOfGIAI96(*epcCompanyPrefix, *epcFilterValue, *epcIndivisualAssetReference)
+		uii, _ = MakeRuneSliceOfGIAI96(*epcCompanyPrefix, *epcFilter, *epcIndivisualAssetReference)
 	}
 
 	// TODO: update pc when length changed (for non-96-bit codes)
@@ -87,8 +93,7 @@ func MakeEPC() string {
 func MakeISO() string {
 	var uii []byte
 	var pc []byte
-	var length uint16
-	var epclen uint16
+	var length int
 
 	isos := []string{"17365", "17363"}
 
@@ -97,40 +102,25 @@ func MakeISO() string {
 	}
 
 	switch *isoScheme {
-	case "17367":
-		uii = MakeRuneSliceOfISO17367()
-	}
-	/*
-		if isos[i] == 17365 {
-			// ISO 17365
-			uii, _ = hex.DecodeString("c4a301c70d36cb32920b1d" + GenerateNLengthHexString(10))
-			pc = Pack([]interface{}{
-				// 16802 : ISO 17365
-				uint8(65),  // L4-0=01000(5words=80bits), UMI=0, XI=0, T=1 : ISO 17365
-				uint8(162), // AFI=10100010 : 17365
-			})
-			// 22, 128 : ISO 17365
-			length = uint16(22)
-			epclen = uint16(128)
-		} else if isos[i] == 17363 {
-			// ISO 17363
-			uii, _ = hex.DecodeString("dc20420c4c" + GenerateNLengthHexString(10))
-			pc = Pack([]interface{}{
-				// 10665 : ISO 17363
-				uint8(41),  // L4-0=00101(8words=128bits), UMI=0, XI=0, T=1 : ISO 17363
-				uint8(169), // AFI=10101001 : 17363
-			})
-			// 16, 80 : ISO 17363
-			length = uint16(16)
-			epclen = uint16(80)
+	case "17365":
+		uii, length = MakeRuneSliceOfISO17365(*isoApplicationFamilyIdentifier, *isoDataIdeintifier, *isoIssuingAgencyCode, *isoCompanyIdentification, *isoSerialNumber)
+		l := []rune(fmt.Sprintf("%.5b",length/16))
+		pc1, err := binutil.ParseBinRuneSliceToUint8Slice(append(l, rune('0'), rune('0'), rune('1')))
+		if err != nil {
+			panic(err)
 		}
-	*/
+
+		pc = binutil.Pack([]interface{}{
+			pc1[0],
+			uint8(162),  // 0xA2 ISO 17365 transport uit
+		})
+	}
 
 	uiibs, _ := binutil.ParseHexStringToBinString(hex.EncodeToString(uii))
 
 	return hex.EncodeToString(pc) + "," +
+		strconv.FormatUint(uint64(length/16), 10) + "," +
 		strconv.FormatUint(uint64(length), 10) + "," +
-		strconv.FormatUint(uint64(epclen), 10) + "," +
 		hex.EncodeToString(uii) + "\n" +
 		uiibs
 }

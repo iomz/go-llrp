@@ -102,6 +102,7 @@ func Parse6BinRuneSliceToRune(r []rune) (rune, error) {
 // Precondition: len(bs) % 8 == 0
 func ParseBinRuneSliceToUint8Slice(bs []rune) ([]uint8, error) {
 	if len(bs)%8 != 0 {
+		fmt.Printf("len(bs): %v\n", len(bs))
 		return nil, errors.New("non-8 bit length binary string passed to ParseBinRuneSliceToUint8Slice")
 	} else if len(bs) < 8 {
 		return nil, errors.New("binary string length less than 8 given to ParseBinRuneSliceToUint8Slice")
@@ -142,6 +143,15 @@ func ParseHexStringToBinString(s string) (string, error) {
 		bs = fmt.Sprintf("%s%.4b", bs, n)
 	}
 	return bs, nil
+}
+
+// ParseRuneSliceTo6BinRuneSlice returns 6-bit encoded rune slice
+func ParseRuneSliceTo6BinRuneSlice(r []rune) []rune {
+	var rs []rune
+	for i:=0;i<len(r);i++ {
+		rs = append(rs, ParseRuneTo6BinRuneSlice(r[i])...)
+	}
+	return rs
 }
 
 // ParseRuneTo6BinRuneSlice coverts rune into 6-bit encoding rune slice
