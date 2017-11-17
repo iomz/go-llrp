@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/big"
 	"math/rand"
+	"regexp"
 	"strconv"
 	"time"
 )
@@ -97,12 +98,6 @@ func Parse6BinRuneSliceToRune(r []rune) (rune, error) {
 	return rune(i), nil
 }
 
-// ParseBigIntToBinString makes binary string from hex string
-func ParseBigIntToBinString(cp *big.Int) string {
-	binStr := fmt.Sprintf("%b", cp)
-	return binStr
-}
-
 // ParseBinRuneSliceToUint8Slice returns uint8 slice from binary string
 // Precondition: len(bs) % 8 == 0
 func ParseBinRuneSliceToUint8Slice(bs []rune) ([]uint8, error) {
@@ -131,17 +126,22 @@ func ParseBinRuneSliceToUint8Slice(bs []rune) ([]uint8, error) {
 // ParseDecimalStringToBinRuneSlice convert serial to binary rune slice
 func ParseDecimalStringToBinRuneSlice(s string) []rune {
 	n, _ := strconv.ParseInt(s, 10, 64)
-	binStr := ParseBigIntToBinString(big.NewInt(n))
-	return []rune(binStr)
+	return []rune(fmt.Sprintf("%b", big.NewInt(n)))
 }
 
 // ParseHexStringToBinString converts hex string to binary string
-func ParseHexStringToBinString(s string) (binString string) {
+func ParseHexStringToBinString(s string) (string, error) {
+	re := regexp.MustCompile("[^0-9a-fA-F]")
+	if re.FindStringIndex(s) != nil {
+		return "", errors.New("Input to ParseHexStringToBinString is not a hex string!")
+	}
+
+	var bs string
 	for _, c := range s {
 		n, _ := strconv.ParseInt(string(c), 16, 32)
-		binString = fmt.Sprintf("%s%.4b", binString, n)
+		bs = fmt.Sprintf("%s%.4b", bs, n)
 	}
-	return
+	return bs, nil
 }
 
 // ParseRuneTo6BinRuneSlice coverts rune into 6-bit encoding rune slice

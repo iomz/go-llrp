@@ -1,7 +1,6 @@
 package binutil
 
 import (
-	"math/big"
 	"reflect"
 	"testing"
 )
@@ -142,28 +141,10 @@ func TestParse6BinRuneSliceToRune(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Parse6BinRuneSliceToRune(tt.args.r); got != tt.want {
+			if got, err := Parse6BinRuneSliceToRune(tt.args.r); got != tt.want {
 				t.Errorf("Parse6BinRuneSliceToRune() = %c, want %c", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestParseBigIntToBinString(t *testing.T) {
-	type args struct {
-		cp *big.Int
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-	// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := ParseBigIntToBinString(tt.args.cp); got != tt.want {
-				t.Errorf("ParseBigIntToBinString() = %v, want %v", got, tt.want)
+			} else if err != nil {
+				t.Errorf(err.Error())
 			}
 		})
 	}
@@ -179,7 +160,10 @@ func TestParseBinRuneSliceToUint8Slice(t *testing.T) {
 		want    []uint8
 		wantErr bool
 	}{
-	// TODO: Add test cases.
+		{"01110101 -> 117", args{[]rune("01110101")}, []uint8{117}, false},
+		{"0000000011111111 -> 0,255", args{[]rune("0000000011111111")}, []uint8{0, 255}, false},
+		{" -> error", args{[]rune("")}, nil, true},
+		{"0000 -> error", args{[]rune("0000")}, nil, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -204,7 +188,10 @@ func TestParseDecimalStringToBinRuneSlice(t *testing.T) {
 		args args
 		want []rune
 	}{
-	// TODO: Add test cases.
+		{"123456789 -> 1001001100101100000001011010010", args{"1234567890"}, []rune("1001001100101100000001011010010")},
+		{"4294967296 -> 100000000000000000000000000000000", args{"4294967296"}, []rune("100000000000000000000000000000000")},
+		{"1 -> 1", args{"1"}, []rune("1")},
+		{"2 -> 10", args{"2"}, []rune("10")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -220,17 +207,25 @@ func TestParseHexStringToBinString(t *testing.T) {
 		s string
 	}
 	tests := []struct {
-		name          string
-		args          args
-		wantBinString string
+		name    string
+		args    args
+		want    string
+		wantErr bool
 	}{
-	// TODO: Add test cases.
+		{"0123456789ABCDEF -> 000000010010001101000101011001111000100110101011110011011111", args{"0123456789ABCDEF"}, "0000000100100011010001010110011110001001101010111100110111101111", false},
+		{"string -> error", args{"string"}, "", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotBinString := ParseHexStringToBinString(tt.args.s); gotBinString != tt.wantBinString {
-				t.Errorf("ParseHexStringToBinString() = %v, want %v", gotBinString, tt.wantBinString)
+			got, err := ParseHexStringToBinString(tt.args.s)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ParseHexStringToBinString() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
+			if got != tt.want {
+				t.Errorf("ParseHexStringToBinString() = %v, want %v", got, tt.want)
+			}
+
 		})
 	}
 }
