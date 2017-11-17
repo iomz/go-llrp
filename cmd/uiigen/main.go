@@ -19,13 +19,14 @@ var (
 	// kingpin generate EPC mode
 	epc = app.Command("epc", "Generate an EPC.")
 	// EPC scheme
-	epcScheme        = epc.Flag("type", "EPC UII type.").Short('t').Default("SGTIN-96").String()
-	epcCompanyPrefix = epc.Flag("companyPrefix", "Company Prefix for EPC UII.").Short('c').Default("").String()
-	epcFilterValue   = epc.Flag("filterValue", "Filter Value for EPC UII.").Short('f').Default("").String()
-	epcItemReference = epc.Flag("itemReference", "Item Reference Value for EPC UII.").Short('i').Default("").String()
-	epcSerial        = epc.Flag("serial", "Serial value for EPC UII.").Short('s').Default("").String()
+	epcScheme                   = epc.Flag("type", "EPC UII type.").Short('t').Default("SGTIN-96").String()
+	epcCompanyPrefix            = epc.Flag("companyPrefix", "Company Prefix for EPC UII.").Short('c').Default("").String()
+	epcFilterValue              = epc.Flag("filterValue", "Filter Value for EPC UII.").Short('f').Default("").String()
+	epcItemReference            = epc.Flag("itemReference", "Item Reference Value for EPC UII.").Short('i').Default("").String()
+	epcExtension                = epc.Flag("extension", "Extension value for EPC UII.").Short('e').Default("").String()
+	epcSerial                   = epc.Flag("serial", "Serial value for EPC UII.").Short('s').Default("").String()
 	epcIndivisualAssetReference = epc.Flag("indivisualAssetReference", "Indivisual Asset Reference value for EPC UII.").Short('a').Default("").String()
-	epcAssetType     = epc.Flag("assetType", "Asset Type for EPC UII.").Short('y').Default("").String()
+	epcAssetType                = epc.Flag("assetType", "Asset Type for EPC UII.").Short('y').Default("").String()
 
 	// kingpin generate ISO UII mode
 	iso = app.Command("iso", "Generate an ISO UII.")
@@ -57,7 +58,7 @@ func MakeEPC() string {
 	case "SGTIN-96":
 		uii, _ = MakeRuneSliceOfSGTIN96(*epcCompanyPrefix, *epcFilterValue, *epcItemReference, *epcSerial)
 	case "SSCC-96":
-		uii, _ = MakeRuneSliceOfSSCC96(*epcCompanyPrefix, *epcFilterValue)
+		uii, _ = MakeRuneSliceOfSSCC96(*epcCompanyPrefix, *epcFilterValue, *epcExtension)
 	case "GRAI-96":
 		uii, _ = MakeRuneSliceOfGRAI96(*epcCompanyPrefix, *epcFilterValue, *epcAssetType, *epcSerial)
 	case "GIAI-96":

@@ -5,7 +5,76 @@ import (
 	"testing"
 )
 
-func TestGetFilterValue(t *testing.T) {
+func TestGetAssetType(t *testing.T) {
+	type args struct {
+		at string
+		pr map[PartitionTableKey]int
+	}
+	tests := []struct {
+		name          string
+		args          args
+		wantAssetType []rune
+	}{
+		{"5678", args{"5678", GRAIPartitionTable[7]}, []rune("00000001011000101110")},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotAssetType := GetAssetType(tt.args.at, tt.args.pr); !reflect.DeepEqual(gotAssetType, tt.wantAssetType) {
+				t.Errorf("GetAssetType() = %v, want %v", string(gotAssetType), string(tt.wantAssetType))
+			}
+		})
+	}
+}
+
+func TestGetCompanyPrefix(t *testing.T) {
+	type args struct {
+		cp string
+		pt map[int]map[PartitionTableKey]int
+	}
+	tests := []struct {
+		name              string
+		args              args
+		wantCompanyPrefix []rune
+	}{
+		{"123456", args{"123456", SGTINPartitionTable},  []rune("00011110001001000000")},
+		{"1234567", args{"1234567", SGTINPartitionTable}, []rune("000100101101011010000111")},
+		{"12345678", args{"12345678", SGTINPartitionTable}, []rune("000101111000110000101001110")},
+		{"123456789", args{"123456789", SGTINPartitionTable}, []rune("000111010110111100110100010101")},
+		{"1234567890", args{"1234567890", SGTINPartitionTable}, []rune("0001001001100101100000001011010010")},
+		{"12345678901", args{"12345678901", SGTINPartitionTable}, []rune("0001011011111110111000001110000110101")},
+		{"123456789012", args{"123456789012", SGTINPartitionTable}, []rune("0001110010111110100110010001101000010100")},
+  }
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotCompanyPrefix := GetCompanyPrefix(tt.args.cp, tt.args.pt); !reflect.DeepEqual(gotCompanyPrefix, tt.wantCompanyPrefix) {
+				t.Errorf("GetCompanyPrefix() = %v, want %v", gotCompanyPrefix, tt.wantCompanyPrefix)
+			}
+		})
+	}
+}
+
+func TestGetExtension(t *testing.T) {
+	type args struct {
+		e  string
+		pr map[PartitionTableKey]int
+	}
+	tests := []struct {
+		name          string
+		args          args
+		wantExtension []rune
+	}{
+		{"1234567890", args{"1234567890", SSCCPartitionTable[7]}, []rune("0001001001100101100000001011010010")},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotExtension := GetExtension(tt.args.e, tt.args.pr); !reflect.DeepEqual(gotExtension, tt.wantExtension) {
+				t.Errorf("GetExtension() = %v, want %v", string(gotExtension), string(tt.wantExtension))
+			}
+		})
+	}
+}
+
+func TestGetFilter(t *testing.T) {
 	type args struct {
 		fv string
 	}
@@ -25,8 +94,8 @@ func TestGetFilterValue(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotFilter := GetFilterValue(tt.args.fv); !reflect.DeepEqual(gotFilter, tt.wantFilter) {
-				t.Errorf("GetFilterValue() = %v, want %v", gotFilter, tt.wantFilter)
+			if gotFilter := GetFilter(tt.args.fv); !reflect.DeepEqual(gotFilter, tt.wantFilter) {
+				t.Errorf("GetFilter() = %v, want %v", gotFilter, tt.wantFilter)
 			}
 		})
 	}
@@ -34,20 +103,20 @@ func TestGetFilterValue(t *testing.T) {
 
 func TestGetIndivisualAssetReference(t *testing.T) {
 	type args struct {
-		iar     string
-		cpSizes []int
+		iar string
+		pr  map[PartitionTableKey]int
 	}
 	tests := []struct {
 		name                         string
 		args                         args
 		wantIndivisualAssetReference []rune
 	}{
-		{"5678", args{"5678", []int{24, 7}}, []rune("0000000000000000000000000000000000000000000001011000101110")},
+		{"5678", args{"5678", GIAIPartitionTable[7]}, []rune("0000000000000000000000000000000000000000000001011000101110")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotIndivisualAssetReference := GetIndivisualAssetReference(tt.args.iar, tt.args.cpSizes); !reflect.DeepEqual(gotIndivisualAssetReference, tt.wantIndivisualAssetReference) {
-				t.Errorf("GetIndivisualAssetReference() = %v, want %v", string(gotIndivisualAssetReference), string(tt.wantIndivisualAssetReference))
+			if gotIndivisualAssetReference := GetIndivisualAssetReference(tt.args.iar, tt.args.pr); !reflect.DeepEqual(gotIndivisualAssetReference, tt.wantIndivisualAssetReference) {
+				t.Errorf("GetIndivisualAssetReference() = %v, want %v", gotIndivisualAssetReference, tt.wantIndivisualAssetReference)
 			}
 		})
 	}
@@ -55,55 +124,20 @@ func TestGetIndivisualAssetReference(t *testing.T) {
 
 func TestGetItemReference(t *testing.T) {
 	type args struct {
-		ir      string
-		cpSizes []int
+		ir string
+		pr map[PartitionTableKey]int
 	}
 	tests := []struct {
 		name              string
 		args              args
 		wantItemReference []rune
 	}{
-		{"1", args{"1", []int{20, 6}}, []rune("000000000000000000000001")},
+		{"1", args{"1", map[PartitionTableKey]int{IRBits: 20, IRDigits: 6}}, []rune("00000000000000000001")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotItemReference := GetItemReference(tt.args.ir, tt.args.cpSizes); !reflect.DeepEqual(gotItemReference, tt.wantItemReference) {
-				t.Errorf("GetItemReference() = %v, want %v", gotItemReference, tt.wantItemReference)
-			}
-		})
-	}
-}
-
-func TestGetPartitionAndCompanyPrefix(t *testing.T) {
-	type args struct {
-		cp string
-	}
-	tests := []struct {
-		name              string
-		args              args
-		wantPartition     []rune
-		wantCompanyPrefix []rune
-		wantCpSizes       []int
-	}{
-		{"123456", args{"123456"}, []rune("110"), []rune("00011110001001000000"), []int{20, 6}},
-		{"1234567", args{"1234567"}, []rune("101"), []rune("000100101101011010000111"), []int{24, 7}},
-		{"12345678", args{"12345678"}, []rune("100"), []rune("000101111000110000101001110"), []int{27, 8}},
-		{"123456789", args{"123456789"}, []rune("011"), []rune("000111010110111100110100010101"), []int{30, 9}},
-		{"1234567890", args{"1234567890"}, []rune("010"), []rune("0001001001100101100000001011010010"), []int{34, 10}},
-		{"12345678901", args{"12345678901"}, []rune("001"), []rune("0001011011111110111000001110000110101"), []int{37, 11}},
-		{"123456789012", args{"123456789012"}, []rune("000"), []rune("0001110010111110100110010001101000010100"), []int{40, 12}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			gotPartition, gotCompanyPrefix, gotCpSizes := GetPartitionAndCompanyPrefix(tt.args.cp)
-			if !reflect.DeepEqual(gotPartition, tt.wantPartition) {
-				t.Errorf("GetPartitionAndCompanyPrefix() gotPartition = %v, want %v", gotPartition, tt.wantPartition)
-			}
-			if !reflect.DeepEqual(gotCompanyPrefix, tt.wantCompanyPrefix) {
-				t.Errorf("GetPartitionAndCompanyPrefix() gotCompanyPrefix = %v, want %v", gotCompanyPrefix, tt.wantCompanyPrefix)
-			}
-			if !reflect.DeepEqual(gotCpSizes, tt.wantCpSizes) {
-				t.Errorf("GetPartitionAndCompanyPrefix() gotCpSizes = %v, want %v", gotCpSizes, tt.wantCpSizes)
+			if gotItemReference := GetItemReference(tt.args.ir, tt.args.pr); !reflect.DeepEqual(gotItemReference, tt.wantItemReference) {
+				t.Errorf("GetItemReference() = %v, want %v", string(gotItemReference), string(tt.wantItemReference))
 			}
 		})
 	}
@@ -202,7 +236,7 @@ func TestMakeRuneSliceOfSGTIN96(t *testing.T) {
 		want    []byte
 		wantErr bool
 	}{
-	// TODO: Add test cases.
+		{"3074257BF7194E4000001A85", args{"0614141", "3", "812345", "6789"}, []byte{48, 116, 37, 123, 247, 25, 78, 64, 0, 0, 26, 133}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -222,6 +256,7 @@ func TestMakeRuneSliceOfSSCC96(t *testing.T) {
 	type args struct {
 		cp string
 		fv string
+		e  string
 	}
 	tests := []struct {
 		name    string
@@ -229,11 +264,11 @@ func TestMakeRuneSliceOfSSCC96(t *testing.T) {
 		want    []byte
 		wantErr bool
 	}{
-	// TODO: Add test cases.
+		{"3174257BF4499602D2000000", args{"0614141", "3", "1234567890"}, []byte{49, 116, 37, 123, 244, 73, 150, 2, 210, 0, 0, 0}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := MakeRuneSliceOfSSCC96(tt.args.cp, tt.args.fv)
+			got, err := MakeRuneSliceOfSSCC96(tt.args.cp, tt.args.fv, tt.args.e)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("MakeRuneSliceOfSSCC96() error = %v, wantErr %v", err, tt.wantErr)
 				return
