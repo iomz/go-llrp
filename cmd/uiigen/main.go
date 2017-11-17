@@ -24,6 +24,8 @@ var (
 	epcFilterValue   = epc.Flag("filterValue", "Filter Value for EPC UII.").Short('f').Default("").String()
 	epcItemReference = epc.Flag("itemReference", "Item Reference Value for EPC UII.").Short('i').Default("").String()
 	epcSerial        = epc.Flag("serial", "Serial value for EPC UII.").Short('s').Default("").String()
+	epcIndivisualAssetReference = epc.Flag("indivisualAssetReference", "Indivisual Asset Reference value for EPC UII.").Short('a').Default("").String()
+	epcAssetType     = epc.Flag("assetType", "Asset Type for EPC UII.").Short('y').Default("").String()
 
 	// kingpin generate ISO UII mode
 	iso = app.Command("iso", "Generate an ISO UII.")
@@ -57,9 +59,9 @@ func MakeEPC() string {
 	case "SSCC-96":
 		uii, _ = MakeRuneSliceOfSSCC96(*epcCompanyPrefix, *epcFilterValue)
 	case "GRAI-96":
-		uii, _ = MakeRuneSliceOfGRAI96(*epcCompanyPrefix, *epcFilterValue)
+		uii, _ = MakeRuneSliceOfGRAI96(*epcCompanyPrefix, *epcFilterValue, *epcAssetType, *epcSerial)
 	case "GIAI-96":
-		uii, _ = MakeRuneSliceOfGIAI96(*epcCompanyPrefix, *epcFilterValue)
+		uii, _ = MakeRuneSliceOfGIAI96(*epcCompanyPrefix, *epcFilterValue, *epcIndivisualAssetReference)
 	}
 
 	// TODO: update pc when length changed (for non-96-bit codes)

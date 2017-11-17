@@ -10,6 +10,55 @@ import (
 	"github.com/iomz/go-llrp/binutil"
 )
 
+type GS1Element int
+
+const (
+	FILTER GS1Element = iota
+	PARTITION
+	COMPANYPREFIX
+	ITEMREFERENCE
+	ASSETTYPE
+	INDIVISUALASSETREFERENCE
+	SERIAL
+)
+
+/*
+var (
+	GRAI_PARTITION_TABLE := map[int]map[GS1Element]int{
+		0 : { COMPANYPREFIX : 40, ASSETTYPE : 4 },
+		1 : { COMPANYPREFIX : 37, ASSETTYPE : 7},
+		2 : { COMPANYPREFIX : 34, ASSETTYPE : 10},
+		3 : { COMPANYPREFIX : 30, ASSETTYPE : 14},
+		4 : { COMPANYPREFIX : 27, ASSETTYPE : 17},
+		5 : { COMPANYPREFIX : 24, ASSETTYPE : 20},
+		6 : { COMPANYPREFIX : 20, ASSETTYPE : 24},
+	}
+	SGTIN_PARTITION_TABLE := map[int]map[GS1Element]int{
+		0 : { COMPANYPREFIX : 40, ASSETTYPE : 4 },
+		1 : { COMPANYPREFIX : 37, ASSETTYPE : 7},
+		2 : { COMPANYPREFIX : 34, ASSETTYPE : 10},
+		3 : { COMPANYPREFIX : 30, ASSETTYPE : 14},
+		4 : { COMPANYPREFIX : 27, ASSETTYPE : 17},
+		5 : { COMPANYPREFIX : 24, ASSETTYPE : 20},
+		6 : { COMPANYPREFIX : 20, ASSETTYPE : 24},
+	}
+)
+*/
+
+// GetAssetType returns Asset Type as rune slice
+func GetAssetType(at string, cpSizes []int) (assetType []rune) {
+	if at != "" {
+		assetType = binutil.ParseDecimalStringToBinRuneSlice(at)
+		if 44-cpSizes[0] > len(assetType) {
+			leftPadding := binutil.GenerateNLengthZeroPaddingRuneSlice(44 - cpSizes[0] - len(assetType))
+			assetType = append(leftPadding, assetType...)
+		}
+	} else {
+		assetType, _ = binutil.GenerateNLengthRandomBinRuneSlice(44-cpSizes[0], uint(math.Pow(float64(10), float64(12-cpSizes[1]))))
+	}
+	return
+}
+
 // GetFilterValue returns filter value as rune slice
 func GetFilterValue(fv string) (filter []rune) {
 	if fv != "" {
@@ -17,6 +66,20 @@ func GetFilterValue(fv string) (filter []rune) {
 		filter = []rune(fmt.Sprintf("%.3b", n))
 	} else {
 		filter, _ = binutil.GenerateNLengthRandomBinRuneSlice(3, 7)
+	}
+	return
+}
+
+// GetIndivisualAssetReference returns iar as rune slice
+func GetIndivisualAssetReference(iar string, cpSizes []int) (indivisualAssetReference []rune) {
+	if iar != "" {
+		indivisualAssetReference = binutil.ParseDecimalStringToBinRuneSlice(iar)
+		if 82-cpSizes[0] > len(indivisualAssetReference) {
+			leftPadding := binutil.GenerateNLengthZeroPaddingRuneSlice(82 - cpSizes[0] - len(indivisualAssetReference))
+			indivisualAssetReference = append(leftPadding, indivisualAssetReference...)
+		}
+	} else {
+		indivisualAssetReference, _ = binutil.GenerateNLengthRandomBinRuneSlice(82-cpSizes[0], uint(math.Pow(float64(10), float64(25-cpSizes[1]))))
 	}
 	return
 }
@@ -115,11 +178,10 @@ func GetSerial(s string, serialLength int) (serial []rune) {
 }
 
 // MakeRuneSliceOfGIAI96 generates GIAI-96
-func MakeRuneSliceOfGIAI96(cp string, fv string) ([]byte, error) {
+func MakeRuneSliceOfGIAI96(cp string, fv string, iar string) ([]byte, error) {
 	filter := GetFilterValue(fv)
 	partition, companyPrefix, cpSizes := GetPartitionAndCompanyPrefix(cp)
-	// TODO: cap overflow
-	indivisualAssetReference, _ := binutil.GenerateNLengthRandomBinRuneSlice(82-cpSizes[0], uint(math.Pow(float64(10), float64(25-cpSizes[1]))))
+	indivisualAssetReference := GetIndivisualAssetReference(iar, cpSizes)
 
 	bs := append(filter, partition...)
 	bs = append(bs, companyPrefix...)
@@ -157,11 +219,11 @@ func MakeRuneSliceOfGIAI96(cp string, fv string) ([]byte, error) {
 }
 
 // MakeRuneSliceOfGRAI96 generates GRAI-96
-func MakeRuneSliceOfGRAI96(cp string, fv string) ([]byte, error) {
+func MakeRuneSliceOfGRAI96(cp string, fv string, at string, s string) ([]byte, error) {
 	filter := GetFilterValue(fv)
 	partition, companyPrefix, cpSizes := GetPartitionAndCompanyPrefix(cp)
-	assetType, _ := binutil.GenerateNLengthRandomBinRuneSlice(44-cpSizes[0], uint(math.Pow(float64(10), float64(12-cpSizes[1]))))
-	serial, _ := binutil.GenerateNLengthRandomBinRuneSlice(38, 0)
+	assetType := GetAssetType(at, cpSizes)
+	serial := GetSerial(s, 38)
 
 	bs := append(filter, partition...)
 	bs = append(bs, companyPrefix...)
