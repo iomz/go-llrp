@@ -24,10 +24,13 @@ func MakeRuneSliceOfISO17365(afi string, di string, iac string, cin string, sn s
 
 	length := len(applicationFamilyIdentifier)+len(dataIdentifier)+len(issuingAgencyCode)+len(companyIdentification)+len(serialNumber)
 	remainder := length % 16
-	var pad []rune
+	var padding []rune
 	if remainder != 0 {
-		pad = binutil.GenerateNLengthZeroPaddingRuneSlice(16-remainder)
-		bs = append(bs, pad...)
+		padRuneSlice := binutil.ParseDecimalStringToBinRuneSlice("32") // pad string "100000"
+		for i:=0; i<16-remainder; i++ {
+			padding = append(padding, padRuneSlice[i%6])
+		}
+		bs = append(bs, padding...)
 		length += 16-remainder
 	}
 
