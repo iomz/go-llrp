@@ -8,13 +8,16 @@ import (
 )
 
 func bin2sixenc(bs []rune) []rune {
-	sixenc := make([]rune, len(bs)/6)
+	var sixenc []rune
 	for i := 0; i*6+6 < len(bs); i++ {
 		r, err := binutil.Parse6BinRuneSliceToRune([]rune(bs[i*6 : i*6+6]))
 		if err != nil {
 			panic(err)
 		}
-		sixenc[i] = r
+		if r == ' ' {
+			continue
+		}
+		sixenc = append(sixenc, r)
 	}
 	return sixenc
 }
