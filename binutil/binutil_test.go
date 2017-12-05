@@ -5,6 +5,50 @@ import (
 	"testing"
 )
 
+func TestGenerateNLengthAlphabetString(t *testing.T) {
+	type args struct {
+		n int
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"n = 0", args{0}, ""},
+		{"n = 1", args{1}, "A"},
+		{"n = 2", args{2}, "AB"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GenerateNLengthHexString(tt.args.n); len(got) != len(tt.want) {
+				t.Errorf("GenerateNLengthHexString() = %v, want %v length", got, len(tt.want))
+			}
+		})
+	}
+}
+
+func TestGenerateNLengthDigitString(t *testing.T) {
+	type args struct {
+		n int
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"n = 0", args{0}, ""},
+		{"n = 1", args{1}, "0"},
+		{"n = 2", args{2}, "01"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GenerateNLengthHexString(tt.args.n); len(got) != len(tt.want) {
+				t.Errorf("GenerateNLengthHexString() = %v, want %v length", got, len(tt.want))
+			}
+		})
+	}
+}
+
 func TestGenerateNLengthHexString(t *testing.T) {
 	type args struct {
 		n int

@@ -15,8 +15,30 @@ import (
 
 var (
 	//hexRunes to hold hex chars
-	hexRunes = []rune("abcdef0123456789")
+	hexRunes      = []rune("0123456789ABCDEF")
+	alphabetRunes = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	digitRunes    = []rune("0123456789")
 )
+
+// GenerateNLengthAlphabetString returns random alphabet rune for n length
+func GenerateNLengthAlphabetString(n int) string {
+	b := make([]rune, n)
+	rand.Seed(time.Now().UTC().UnixNano())
+	for i := range b {
+		b[i] = alphabetRunes[rand.Intn(len(alphabetRunes))]
+	}
+	return string(b)
+}
+
+// GenerateNLengthDigitString returns random digit rune for n length
+func GenerateNLengthDigitString(n int) string {
+	b := make([]rune, n)
+	rand.Seed(time.Now().UTC().UnixNano())
+	for i := range b {
+		b[i] = digitRunes[rand.Intn(len(digitRunes))]
+	}
+	return string(b)
+}
 
 // GenerateNLengthHexString returns random hex rune for n length
 func GenerateNLengthHexString(n int) string {
@@ -103,7 +125,7 @@ func Parse6BinRuneSliceToRune(r []rune) (rune, error) {
 func ParseBinRuneSliceToUint8Slice(bs []rune) ([]uint8, error) {
 	if len(bs)%8 != 0 {
 		fmt.Printf("len(bs): %v\n", len(bs))
-		return nil, errors.New("non-8 bit length binary string passed to ParseBinRuneSliceToUint8Slice")
+		return nil, errors.New("non-8 bit length binary string passed to ParseBinRuneSliceToUint8Slice: " + string(bs))
 	} else if len(bs) < 8 {
 		return nil, errors.New("binary string length less than 8 given to ParseBinRuneSliceToUint8Slice")
 	}
@@ -134,7 +156,7 @@ func ParseDecimalStringToBinRuneSlice(s string) []rune {
 func ParseHexStringToBinString(s string) (string, error) {
 	re := regexp.MustCompile("[^0-9a-fA-F]")
 	if re.FindStringIndex(s) != nil {
-		return "", errors.New("Input to ParseHexStringToBinString is not a hex string!")
+		return "", errors.New("Input to ParseHexStringToBinString is not a hex string")
 	}
 
 	var bs string
@@ -148,7 +170,7 @@ func ParseHexStringToBinString(s string) (string, error) {
 // ParseRuneSliceTo6BinRuneSlice returns 6-bit encoded rune slice
 func ParseRuneSliceTo6BinRuneSlice(r []rune) []rune {
 	var rs []rune
-	for i:=0;i<len(r);i++ {
+	for i := 0; i < len(r); i++ {
 		rs = append(rs, ParseRuneTo6BinRuneSlice(r[i])...)
 	}
 	return rs
