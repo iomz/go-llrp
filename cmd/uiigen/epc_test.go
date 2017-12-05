@@ -133,11 +133,15 @@ func TestGetItemReference(t *testing.T) {
 		wantItemReference []rune
 	}{
 		{"1", args{"1", map[PartitionTableKey]int{IRBits: 20, IRDigits: 6}}, []rune("00000000000000000001")},
+		{"(blank)", args{"", map[PartitionTableKey]int{IRBits: 20, IRDigits: 6}}, []rune("00000000000000000001")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotItemReference := GetItemReference(tt.args.ir, tt.args.pr); !reflect.DeepEqual(gotItemReference, tt.wantItemReference) {
-				t.Errorf("GetItemReference() = %v, want %v", string(gotItemReference), string(tt.wantItemReference))
+				t.Logf("GetItemReference() = %v, want %v", string(gotItemReference), string(tt.wantItemReference))
+				if len(gotItemReference) != len(tt.wantItemReference) {
+					t.Errorf("len(GetItemReference()) = %v, want %v", len(string(gotItemReference)), len(string(tt.wantItemReference)))
+				}
 			}
 		})
 	}
@@ -156,11 +160,15 @@ func TestGetSerial(t *testing.T) {
 		{"1(4) ", args{"1", 4}, []rune("0001")},
 		{"10(10)", args{"10", 10}, []rune("0000001010")},
 		{"100(38)", args{"100", 38}, []rune("00000000000000000000000000000001100100")},
+		{"(blank)(38)", args{"", 38}, []rune("00000000000000000000000000000001100100")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotSerial := GetSerial(tt.args.s, tt.args.serialLength); !reflect.DeepEqual(gotSerial, tt.wantSerial) {
-				t.Errorf("GetSerial() = %v, want %v", string(gotSerial), string(tt.wantSerial))
+				t.Logf("GetSerial() = %v, want %v", string(gotSerial), string(tt.wantSerial))
+				if len(gotSerial) != len(tt.wantSerial) {
+					t.Errorf("len(GetSerial()) = %v, want %v", len(string(gotSerial)), len(string(tt.wantSerial)))
+				}
 			}
 		})
 	}

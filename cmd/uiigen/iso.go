@@ -28,23 +28,30 @@ func GetISO6346CD(cn string) (int, error) {
 // MakeRuneSliceOfISO17363 generates a random 17363 code
 func MakeRuneSliceOfISO17363(afi string, oc string, ei string, csn string) ([]byte, int) {
 	applicationFamilyIdentifier, _ := binutil.ParseHexStringToBinString(afi)
+	di := "7B"
+	dataIdentifier := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(di))
+	if oc == "" {
+		oc = binutil.GenerateNLengthAlphabetString(3)
+	}
 	ownerCode := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(oc))
 	equipmentIdentifier := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(ei))
-	fmt.Println(oc + ei + csn)
+	if csn == "" {
+		csn = binutil.GenerateNLengthDigitString(6)
+	}
 	cd, err := GetISO6346CD(oc + ei + csn)
 	if err != nil {
 		panic(err)
 	}
-
 	containerSerialNumber := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(csn + fmt.Sprintf("%v", cd)))
 
 	var bs []rune
 	bs = append(bs, []rune(applicationFamilyIdentifier)...)
+	bs = append(bs, dataIdentifier...)
 	bs = append(bs, ownerCode...)
 	bs = append(bs, equipmentIdentifier...)
 	bs = append(bs, containerSerialNumber...)
 
-	length := len(applicationFamilyIdentifier) + len(ownerCode) + len(equipmentIdentifier) + len(containerSerialNumber)
+	length := len(applicationFamilyIdentifier) + len(dataIdentifier) + len(ownerCode) + len(equipmentIdentifier) + len(containerSerialNumber)
 	remainder := length % 16
 	var padding []rune
 	if remainder != 0 {
@@ -74,6 +81,9 @@ func MakeRuneSliceOfISO17365(afi string, di string, iac string, cin string, sn s
 	dataIdentifier := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(di))
 	issuingAgencyCode := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(iac))
 	companyIdentification := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(cin))
+	if sn == "" {
+		sn = binutil.GenerateNLengthHexString(18)
+	}
 	serialNumber := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(sn))
 
 	var bs []rune

@@ -157,8 +157,7 @@ func GetSerial(s string, serialLength int) (serial []rune) {
 			serial = append(leftPadding, serial...)
 		}
 	} else {
-		serial, _ := binutil.GenerateNLengthRandomBinRuneSlice(serialLength, uint(math.Pow(float64(2), float64(serialLength))))
-		_ = serial
+		serial, _ = binutil.GenerateNLengthRandomBinRuneSlice(serialLength, uint(math.Pow(float64(2), float64(serialLength))))
 	}
 	return serial
 }
@@ -263,6 +262,7 @@ func MakeRuneSliceOfSGTIN96(cp string, fv string, ir string, s string) ([]byte, 
 	bs = append(bs, serial...)
 
 	if len(bs) != 88 {
+		fmt.Printf("cp: %v fv: %v ir: %v s: %v\n", companyPrefix, partition, itemReference, serial)
 		fmt.Println("UII size without EPC header: ", len(bs))
 		return nil, errors.New("Something went wrong in generating SGTIN-96!")
 	}

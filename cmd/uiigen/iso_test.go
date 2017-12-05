@@ -44,7 +44,7 @@ func TestMakeRuneSliceOfISO17363(t *testing.T) {
 		want  []byte
 		want1 int
 	}{
-		{"A97BCSQU3054383", args{"A9", "CSQ", "U", "305438"}, []byte{169, 13, 52, 85, 207, 13, 116, 207, 140, 224}, 80},
+		{"A97BCSQU3054383", args{"A9", "CSQ", "U", "305438"}, []byte{169, 220, 32, 211, 69, 92, 240, 215, 76, 248, 206, 8}, 96},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

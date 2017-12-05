@@ -20,26 +20,26 @@ var (
 	epc = app.Command("epc", "Generate an EPC.")
 	// EPC scheme
 	epcScheme                   = epc.Flag("type", "EPC UII type.").Default("SGTIN-96").String()
-	epcCompanyPrefix            = epc.Flag("companyPrefix", "Company Prefix for EPC.").Default("").String()
-	epcFilter                   = epc.Flag("filter", "Filter Value for EPC.").Default("").String()
-	epcItemReference            = epc.Flag("itemReference", "Item Reference Value for EPC.").Default("").String()
-	epcExtension                = epc.Flag("extension", "Extension value for EPC.").Default("").String()
-	epcSerial                   = epc.Flag("serial", "Serial value for EPC.").Default("").String()
-	epcIndivisualAssetReference = epc.Flag("indivisualAssetReference", "Indivisual Asset Reference value for EPC.").Default("").String()
-	epcAssetType                = epc.Flag("assetType", "Asset Type for EPC.").Short('y').Default("").String()
+	epcCompanyPrefix            = epc.Flag("companyPrefix", "Company Prefix for EPC.").Default("0614141").String()
+	epcFilter                   = epc.Flag("filter", "Filter Value for EPC.").String()
+	epcItemReference            = epc.Flag("itemReference", "Item Reference Value for EPC.").String()
+	epcExtension                = epc.Flag("extension", "Extension value for EPC.").String()
+	epcSerial                   = epc.Flag("serial", "Serial value for EPC.").String()
+	epcIndivisualAssetReference = epc.Flag("indivisualAssetReference", "Indivisual Asset Reference value for EPC.").String()
+	epcAssetType                = epc.Flag("assetType", "Asset Type for EPC.").String()
 
 	// kingpin generate ISO UII mode
 	iso = app.Command("iso", "Generate an ISO UII.")
 
 	// ISO scheme
 	isoScheme                      = iso.Flag("scheme", "Scheme for ISO UII.").Default("17365").String()
-	isoContainerSerialNumber       = iso.Flag("containerSerialNumber", "A six digit serial number (CSN).").Default("305438").String()
+	isoContainerSerialNumber       = iso.Flag("containerSerialNumber", "A six digit serial number (CSN). ex.) 305438").String()
 	isoCompanyIdentification       = iso.Flag("companyIdentification", "Company Identification for ISO UII.").Default("043325711").String()
 	isoDataIdeintifier             = iso.Flag("dataIdentifier", "Data Identifier for ISO UII.").Default("25S").String()
 	isoEquipmentCategoryIdentifier = iso.Flag("equipmentIdentifier", "A one letter equipment category identifier (EI).").Default("U").String()
 	isoIssuingAgencyCode           = iso.Flag("issuingAgencyCode", "Issuing Agency Code for ISO UII.").Default("UN").String()
-	isoOwnerCode                   = iso.Flag("owenerCode", "A three letter container owner code (OC) assigned in cooperation with the Bureau International des Containers et du Transport Intermodal(BIC).").Default("CSQ").String()
-	isoSerialNumber                = iso.Flag("serialNumber", "Serial Number for ISO UII.").Default("MH8031200000000001").String()
+	isoOwnerCode                   = iso.Flag("ownerCode", "A three letter container owner code (OC) assigned in cooperation with the Bureau International des Containers et du Transport Intermodal(BIC). ex.) CSQ").String()
+	isoSerialNumber                = iso.Flag("serialNumber", "Serial Number for ISO UII. ex.) MH8031200000000001").String()
 )
 
 // CheckIfStringInSlice checks if string exists in a string slice
@@ -62,15 +62,19 @@ func MakeEPC() string {
 	}
 
 	var uii []byte
+	var err error
 	switch strings.ToUpper(*epcScheme) {
 	case "SGTIN-96":
-		uii, _ = MakeRuneSliceOfSGTIN96(*epcCompanyPrefix, *epcFilter, *epcItemReference, *epcSerial)
+		uii, err = MakeRuneSliceOfSGTIN96(*epcCompanyPrefix, *epcFilter, *epcItemReference, *epcSerial)
 	case "SSCC-96":
-		uii, _ = MakeRuneSliceOfSSCC96(*epcCompanyPrefix, *epcFilter, *epcExtension)
+		uii, err = MakeRuneSliceOfSSCC96(*epcCompanyPrefix, *epcFilter, *epcExtension)
 	case "GRAI-96":
-		uii, _ = MakeRuneSliceOfGRAI96(*epcCompanyPrefix, *epcFilter, *epcAssetType, *epcSerial)
+		uii, err = MakeRuneSliceOfGRAI96(*epcCompanyPrefix, *epcFilter, *epcAssetType, *epcSerial)
 	case "GIAI-96":
-		uii, _ = MakeRuneSliceOfGIAI96(*epcCompanyPrefix, *epcFilter, *epcIndivisualAssetReference)
+		uii, err = MakeRuneSliceOfGIAI96(*epcCompanyPrefix, *epcFilter, *epcIndivisualAssetReference)
+	}
+	if err != nil {
+		panic(err)
 	}
 
 	// TODO: update pc when length changed (for non-96-bit codes)
@@ -79,16 +83,18 @@ func MakeEPC() string {
 		uint8(0),  // RFU=0
 	})
 
-	length := uint16(18)
-	epclen := uint16(96)
-
 	uiibs, _ := binutil.ParseHexStringToBinString(hex.EncodeToString(uii))
 
+	return hex.EncodeToString(pc) + "," + uiibs
+	/*
+	length := uint16(18)
+	epclen := uint16(96)
 	return hex.EncodeToString(pc) + "," +
 		strconv.FormatUint(uint64(length), 10) + "," +
 		strconv.FormatUint(uint64(epclen), 10) + "," +
 		hex.EncodeToString(uii) + "\n" +
 		uiibs
+	*/
 }
 
 // MakeISO returns ISO code
@@ -116,11 +122,14 @@ func MakeISO() string {
 
 	uiibs, _ := binutil.ParseHexStringToBinString(hex.EncodeToString(uii))
 
+	return hex.EncodeToString(pc) + "," + uiibs
+	/*
 	return hex.EncodeToString(pc) + "," +
 		strconv.FormatUint(uint64(length/16), 10) + "," +
 		strconv.FormatUint(uint64(length), 10) + "," +
 		hex.EncodeToString(uii) + "\n" +
 		uiibs
+	*/
 }
 
 // MakePC returns PC bits
