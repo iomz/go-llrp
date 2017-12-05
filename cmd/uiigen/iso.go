@@ -26,8 +26,7 @@ func GetISO6346CD(cn string) (int, error) {
 }
 
 // MakeRuneSliceOfISO17363 generates a random 17363 code
-func MakeRuneSliceOfISO17363(afi string, oc string, ei string, csn string) ([]byte, int) {
-	applicationFamilyIdentifier, _ := binutil.ParseHexStringToBinString(afi)
+func MakeRuneSliceOfISO17363(oc string, ei string, csn string) ([]byte, int) {
 	di := "7B"
 	dataIdentifier := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(di))
 	if oc == "" {
@@ -37,6 +36,11 @@ func MakeRuneSliceOfISO17363(afi string, oc string, ei string, csn string) ([]by
 	equipmentIdentifier := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(ei))
 	if csn == "" {
 		csn = binutil.GenerateNLengthDigitString(6)
+	} else if 6 > len(csn) {
+		leftPadding := binutil.GenerateNLengthZeroPaddingRuneSlice(6 - len(csn))
+		csn = string(leftPadding) + csn
+	} else if 6 < len(csn) {
+		panic("Invalid csn: " + csn)
 	}
 	cd, err := GetISO6346CD(oc + ei + csn)
 	if err != nil {
@@ -45,13 +49,12 @@ func MakeRuneSliceOfISO17363(afi string, oc string, ei string, csn string) ([]by
 	containerSerialNumber := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(csn + fmt.Sprintf("%v", cd)))
 
 	var bs []rune
-	bs = append(bs, []rune(applicationFamilyIdentifier)...)
-	bs = append(bs, dataIdentifier...)
+	bs = append(bs, []rune(dataIdentifier)...)
 	bs = append(bs, ownerCode...)
 	bs = append(bs, equipmentIdentifier...)
 	bs = append(bs, containerSerialNumber...)
 
-	length := len(applicationFamilyIdentifier) + len(dataIdentifier) + len(ownerCode) + len(equipmentIdentifier) + len(containerSerialNumber)
+	length := len(dataIdentifier) + len(ownerCode) + len(equipmentIdentifier) + len(containerSerialNumber)
 	remainder := length % 16
 	var padding []rune
 	if remainder != 0 {
@@ -76,8 +79,7 @@ func MakeRuneSliceOfISO17363(afi string, oc string, ei string, csn string) ([]by
 }
 
 // MakeRuneSliceOfISO17365 generates a random 17367 code
-func MakeRuneSliceOfISO17365(afi string, di string, iac string, cin string, sn string) ([]byte, int) {
-	applicationFamilyIdentifier, _ := binutil.ParseHexStringToBinString(afi)
+func MakeRuneSliceOfISO17365(di string, iac string, cin string, sn string) ([]byte, int) {
 	dataIdentifier := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(di))
 	issuingAgencyCode := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(iac))
 	companyIdentification := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(cin))
@@ -87,13 +89,12 @@ func MakeRuneSliceOfISO17365(afi string, di string, iac string, cin string, sn s
 	serialNumber := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(sn))
 
 	var bs []rune
-	bs = append(bs, []rune(applicationFamilyIdentifier)...)
-	bs = append(bs, dataIdentifier...)
+	bs = append(bs, []rune(dataIdentifier)...)
 	bs = append(bs, issuingAgencyCode...)
 	bs = append(bs, companyIdentification...)
 	bs = append(bs, serialNumber...)
 
-	length := len(applicationFamilyIdentifier) + len(dataIdentifier) + len(issuingAgencyCode) + len(companyIdentification) + len(serialNumber)
+	length := len(dataIdentifier) + len(issuingAgencyCode) + len(companyIdentification) + len(serialNumber)
 	remainder := length % 16
 	var padding []rune
 	if remainder != 0 {

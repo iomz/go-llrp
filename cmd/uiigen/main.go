@@ -112,11 +112,11 @@ func MakeISO() string {
 	switch *isoScheme {
 	case "17363":
 		afi := "A9" // 0xA9 ISO 17363 freight containers
-		uii, length = MakeRuneSliceOfISO17363(afi, *isoOwnerCode, *isoEquipmentCategoryIdentifier, *isoContainerSerialNumber)
+		uii, length = MakeRuneSliceOfISO17363(*isoOwnerCode, *isoEquipmentCategoryIdentifier, *isoContainerSerialNumber)
 		pc = MakeISOPC(length, afi)
 	case "17365":
 		afi := "A2" // 0xA2 ISO 17365 transport uit
-		uii, length = MakeRuneSliceOfISO17365(afi, *isoDataIdeintifier, *isoIssuingAgencyCode, *isoCompanyIdentification, *isoSerialNumber)
+		uii, length = MakeRuneSliceOfISO17365(*isoDataIdeintifier, *isoIssuingAgencyCode, *isoCompanyIdentification, *isoSerialNumber)
 		pc = MakeISOPC(length, afi)
 	}
 
