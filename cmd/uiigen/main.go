@@ -20,26 +20,26 @@ var (
 	epc = app.Command("epc", "Generate an EPC.")
 	// EPC scheme
 	epcScheme                   = epc.Flag("type", "EPC UII type.").Default("SGTIN-96").String()
-	epcCompanyPrefix            = epc.Flag("companyPrefix", "Company Prefix for EPC.").Default("0614141").String()
-	epcFilter                   = epc.Flag("filter", "Filter Value for EPC.").String()
-	epcItemReference            = epc.Flag("itemReference", "Item Reference Value for EPC.").String()
-	epcExtension                = epc.Flag("extension", "Extension value for EPC.").String()
-	epcSerial                   = epc.Flag("serial", "Serial value for EPC.").String()
-	epcIndivisualAssetReference = epc.Flag("indivisualAssetReference", "Indivisual Asset Reference value for EPC.").String()
-	epcAssetType                = epc.Flag("assetType", "Asset Type for EPC.").String()
+	epcFilter                   = epc.Flag("filter", "Filter Value for EPC.").Default("3").String()
+	epcCompanyPrefix            = epc.Flag("companyPrefix", "[GIAI,GRAI,SGTIN,SSCC] Company Prefix for EPC.").Default("0614141").String()
+	epcItemReference            = epc.Flag("itemReference", "[SGTIN] Item Reference Value for EPC.").String()
+	epcExtension                = epc.Flag("extension", "[SSCC] Extension value for EPC.").String()
+	epcSerial                   = epc.Flag("serial", "[GRAI,SGTIN] Serial value for EPC.").String()
+	epcIndivisualAssetReference = epc.Flag("indivisualAssetReference", "[GIAI] Indivisual Asset Reference value for EPC.").String()
+	epcAssetType                = epc.Flag("assetType", "[GRAI] Asset Type for EPC.").String()
 
 	// kingpin generate ISO UII mode
 	iso = app.Command("iso", "Generate an ISO UII.")
 
 	// ISO scheme
 	isoScheme                      = iso.Flag("scheme", "Scheme for ISO UII.").Default("17365").String()
-	isoContainerSerialNumber       = iso.Flag("containerSerialNumber", "A six digit serial number (CSN). ex.) 305438").String()
-	isoCompanyIdentification       = iso.Flag("companyIdentification", "Company Identification for ISO UII.").Default("043325711").String()
-	isoDataIdeintifier             = iso.Flag("dataIdentifier", "Data Identifier for ISO UII.").Default("25S").String()
-	isoEquipmentCategoryIdentifier = iso.Flag("equipmentIdentifier", "A one letter equipment category identifier (EI).").Default("U").String()
-	isoIssuingAgencyCode           = iso.Flag("issuingAgencyCode", "Issuing Agency Code for ISO UII.").Default("UN").String()
-	isoOwnerCode                   = iso.Flag("ownerCode", "A three letter container owner code (OC) assigned in cooperation with the Bureau International des Containers et du Transport Intermodal(BIC). ex.) CSQ").String()
-	isoSerialNumber                = iso.Flag("serialNumber", "Serial Number for ISO UII. ex.) MH8031200000000001").String()
+	isoOwnerCode                   = iso.Flag("ownerCode", "[17363] A three letter container owner code (OC) assigned in cooperation with the Bureau International des Containers et du Transport Intermodal(BIC). ex.) CSQ").String()
+	isoEquipmentCategoryIdentifier = iso.Flag("equipmentIdentifier", "[17363] A one letter equipment category identifier (EI).").Default("U").String()
+	isoContainerSerialNumber       = iso.Flag("containerSerialNumber", "[17363] A six digit serial number (CSN). ex.) 305438").String()
+	isoDataIdeintifier             = iso.Flag("dataIdentifier", "[17365] Data Identifier for ISO UII.").Default("25S").String()
+	isoIssuingAgencyCode           = iso.Flag("issuingAgencyCode", "[17365] Issuing Agency Code for ISO UII.").Default("UN").String()
+	isoCompanyIdentification       = iso.Flag("companyIdentification", "[17365] Company Identification for ISO UII.").Default("043325711").String()
+	isoSerialNumber                = iso.Flag("serialNumber", "[17365] Serial Number for ISO UII. ex.) MH8031200000000001").String()
 )
 
 // CheckIfStringInSlice checks if string exists in a string slice
@@ -64,14 +64,14 @@ func MakeEPC() string {
 	var uii []byte
 	var err error
 	switch strings.ToUpper(*epcScheme) {
+	case "GIAI-96":
+		uii, err = MakeRuneSliceOfGIAI96(*epcCompanyPrefix, *epcFilter, *epcIndivisualAssetReference)
+	case "GRAI-96":
+		uii, err = MakeRuneSliceOfGRAI96(*epcCompanyPrefix, *epcFilter, *epcAssetType, *epcSerial)
 	case "SGTIN-96":
 		uii, err = MakeRuneSliceOfSGTIN96(*epcCompanyPrefix, *epcFilter, *epcItemReference, *epcSerial)
 	case "SSCC-96":
 		uii, err = MakeRuneSliceOfSSCC96(*epcCompanyPrefix, *epcFilter, *epcExtension)
-	case "GRAI-96":
-		uii, err = MakeRuneSliceOfGRAI96(*epcCompanyPrefix, *epcFilter, *epcAssetType, *epcSerial)
-	case "GIAI-96":
-		uii, err = MakeRuneSliceOfGIAI96(*epcCompanyPrefix, *epcFilter, *epcIndivisualAssetReference)
 	}
 	if err != nil {
 		panic(err)
@@ -110,13 +110,13 @@ func MakeISO() string {
 	}
 
 	switch *isoScheme {
-	case "17365":
-		afi := "A2" // 0xA2 ISO 17365 transport uit
-		uii, length = MakeRuneSliceOfISO17365(afi, *isoDataIdeintifier, *isoIssuingAgencyCode, *isoCompanyIdentification, *isoSerialNumber)
-		pc = MakeISOPC(length, afi)
 	case "17363":
 		afi := "A9" // 0xA9 ISO 17363 freight containers
 		uii, length = MakeRuneSliceOfISO17363(afi, *isoOwnerCode, *isoEquipmentCategoryIdentifier, *isoContainerSerialNumber)
+		pc = MakeISOPC(length, afi)
+	case "17365":
+		afi := "A2" // 0xA2 ISO 17365 transport uit
+		uii, length = MakeRuneSliceOfISO17365(afi, *isoDataIdeintifier, *isoIssuingAgencyCode, *isoCompanyIdentification, *isoSerialNumber)
 		pc = MakeISOPC(length, afi)
 	}
 
