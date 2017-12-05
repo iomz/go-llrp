@@ -5,6 +5,60 @@ import (
 	"testing"
 )
 
+func TestGetISO6346CD(t *testing.T) {
+	type args struct {
+		cn string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    int
+		wantErr bool
+	}{
+		{"CSQU305438", args{"CSQU305438"}, 3, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GetISO6346CD(tt.args.cn)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetISO6346CD() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("GetISO6346CD() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMakeRuneSliceOfISO17363(t *testing.T) {
+	type args struct {
+		afi string
+		oc  string
+		ei  string
+		csn string
+	}
+	tests := []struct {
+		name  string
+		args  args
+		want  []byte
+		want1 int
+	}{
+		{"A97BCSQU3054383", args{"A9", "CSQ", "U", "305438"}, []byte{169, 13, 52, 85, 207, 13, 116, 207, 140, 224}, 80},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1 := MakeRuneSliceOfISO17363(tt.args.afi, tt.args.oc, tt.args.ei, tt.args.csn)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("MakeRuneSliceOfISO17363() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("MakeRuneSliceOfISO17363() got1 = %v, want %v", got1, tt.want1)
+			}
+		})
+	}
+}
+
 func TestMakeRuneSliceOfISO17365(t *testing.T) {
 	type args struct {
 		afi string

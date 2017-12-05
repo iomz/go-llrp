@@ -21,7 +21,7 @@ var (
 	// EPC scheme
 	epcScheme                   = epc.Flag("type", "EPC UII type.").Default("SGTIN-96").String()
 	epcCompanyPrefix            = epc.Flag("companyPrefix", "Company Prefix for EPC.").Default("").String()
-	epcFilter              = epc.Flag("filter", "Filter Value for EPC.").Default("").String()
+	epcFilter                   = epc.Flag("filter", "Filter Value for EPC.").Default("").String()
 	epcItemReference            = epc.Flag("itemReference", "Item Reference Value for EPC.").Default("").String()
 	epcExtension                = epc.Flag("extension", "Extension value for EPC.").Default("").String()
 	epcSerial                   = epc.Flag("serial", "Serial value for EPC.").Default("").String()
@@ -33,10 +33,12 @@ var (
 
 	// ISO scheme
 	isoScheme                      = iso.Flag("scheme", "Scheme for ISO UII.").Default("17365").String()
-	isoApplicationFamilyIdentifier = iso.Flag("applicationFamilyIdentifier", "Application Family Identifier for ISO UII.").Default("A1").String()
-	isoDataIdeintifier             = iso.Flag("dataIdentifier", "Data Identifier for ISO UII.").Default("25S").String()
-	isoIssuingAgencyCode           = iso.Flag("issuingAgencyCode", "Issuing Agency Code for ISO UII.").Default("UN").String()
+	isoContainerSerialNumber       = iso.Flag("containerSerialNumber", "A six digit serial number (CSN).").Default("305438").String()
 	isoCompanyIdentification       = iso.Flag("companyIdentification", "Company Identification for ISO UII.").Default("043325711").String()
+	isoDataIdeintifier             = iso.Flag("dataIdentifier", "Data Identifier for ISO UII.").Default("25S").String()
+	isoEquipmentCategoryIdentifier = iso.Flag("equipmentIdentifier", "A one letter equipment category identifier (EI).").Default("U").String()
+	isoIssuingAgencyCode           = iso.Flag("issuingAgencyCode", "Issuing Agency Code for ISO UII.").Default("UN").String()
+	isoOwnerCode                   = iso.Flag("owenerCode", "A three letter container owner code (OC) assigned in cooperation with the Bureau International des Containers et du Transport Intermodal(BIC).").Default("CSQ").String()
 	isoSerialNumber                = iso.Flag("serialNumber", "Serial Number for ISO UII.").Default("MH8031200000000001").String()
 )
 
@@ -103,17 +105,13 @@ func MakeISO() string {
 
 	switch *isoScheme {
 	case "17365":
-		uii, length = MakeRuneSliceOfISO17365(*isoApplicationFamilyIdentifier, *isoDataIdeintifier, *isoIssuingAgencyCode, *isoCompanyIdentification, *isoSerialNumber)
-		l := []rune(fmt.Sprintf("%.5b",length/16))
-		pc1, err := binutil.ParseBinRuneSliceToUint8Slice(append(l, rune('0'), rune('0'), rune('1')))
-		if err != nil {
-			panic(err)
-		}
-
-		pc = binutil.Pack([]interface{}{
-			pc1[0],
-			uint8(162),  // 0xA2 ISO 17365 transport uit
-		})
+		afi := "A2" // 0xA2 ISO 17365 transport uit
+		uii, length = MakeRuneSliceOfISO17365(afi, *isoDataIdeintifier, *isoIssuingAgencyCode, *isoCompanyIdentification, *isoSerialNumber)
+		pc = MakeISOPC(length, afi)
+	case "17363":
+		afi := "A9" // 0xA9 ISO 17363 freight containers
+		uii, length = MakeRuneSliceOfISO17363(afi, *isoOwnerCode, *isoEquipmentCategoryIdentifier, *isoContainerSerialNumber)
+		pc = MakeISOPC(length, afi)
 	}
 
 	uiibs, _ := binutil.ParseHexStringToBinString(hex.EncodeToString(uii))
@@ -123,6 +121,20 @@ func MakeISO() string {
 		strconv.FormatUint(uint64(length), 10) + "," +
 		hex.EncodeToString(uii) + "\n" +
 		uiibs
+}
+
+// MakePC returns PC bits
+func MakeISOPC(length int, afi string) []byte {
+	l := []rune(fmt.Sprintf("%.5b", length/16))
+	pc1, err := binutil.ParseBinRuneSliceToUint8Slice(append(l, rune('0'), rune('0'), rune('1'))) // L, UMI, XI, T
+	if err != nil {
+		panic(err)
+	}
+	c, _ := strconv.ParseUint(afi, 16, 8)
+	return binutil.Pack([]interface{}{
+		pc1[0],
+		uint8(c), // AFI
+	})
 }
 
 func main() {
