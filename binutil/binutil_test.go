@@ -233,8 +233,7 @@ func TestParseBinRuneSliceToInt(t *testing.T) {
 		want int
 	}{
 		{"0111 = 7", args{[]rune("0111")}, 7},
-		{"", args{[]rune("")}},
-		{"", args{[]rune("")}},
+		{"10 = 2", args{[]rune("10")}, 2},
 		//{"", args{[]rune("")}, },
 	}
 	for _, tt := range tests {
