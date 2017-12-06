@@ -223,6 +223,29 @@ func TestParseBinRuneSliceToUint8Slice(t *testing.T) {
 	}
 }
 
+func TestParseBinRuneSliceToInt(t *testing.T) {
+	type args struct {
+		bs []rune
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{"0111 = 7", args{[]rune("0111")}, 7},
+		{"", args{[]rune("")}},
+		{"", args{[]rune("")}},
+		//{"", args{[]rune("")}, },
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ParseBinRuneSliceToInt(tt.args.bs); got != tt.want {
+				t.Errorf("ParseBinRuneSliceToInt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestParseDecimalStringToBinRuneSlice(t *testing.T) {
 	type args struct {
 		s string

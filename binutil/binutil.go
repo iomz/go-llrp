@@ -146,6 +146,15 @@ func ParseBinRuneSliceToUint8Slice(bs []rune) ([]uint8, error) {
 	return uints, nil
 }
 
+// ParseBinRuneSliceToInt returns int value of the binary string
+func ParseBinRuneSliceToInt(bs []rune) int {
+	i, err := strconv.ParseInt(string(bs), 2, 32)
+	if err != nil {
+		panic(err)
+	}
+	return int(i)
+}
+
 // ParseDecimalStringToBinRuneSlice convert serial to binary rune slice
 func ParseDecimalStringToBinRuneSlice(s string) []rune {
 	n, _ := strconv.ParseInt(s, 10, 64)
