@@ -3,11 +3,13 @@ package binutil
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/gob"
 	"errors"
 	"fmt"
 	"math"
 	"math/big"
 	"math/rand"
+	"os"
 	"regexp"
 	"strconv"
 	"time"
@@ -120,6 +122,15 @@ func Parse6BinRuneSliceToRune(r []rune) (rune, error) {
 	return rune(i), nil
 }
 
+// ParseByteSliceToBinString returns run slice of bytes
+func ParseByteSliceToBinString(bys []byte) string {
+	bs := ""
+	for _, b := range bys {
+		bs += fmt.Sprintf("%.8b", b)
+	}
+	return bs
+}
+
 // ParseBinRuneSliceToUint8Slice returns uint8 slice from binary string
 // Precondition: len(bs) % 8 == 0
 func ParseBinRuneSliceToUint8Slice(bs []rune) ([]uint8, error) {
@@ -192,4 +203,26 @@ func ParseRuneTo6BinRuneSlice(r rune) []rune {
 	}
 	binString := fmt.Sprintf("%.6b", r)
 	return []rune(binString)
+}
+
+// Encode via Gob to file
+func Save(path string, object interface{}) error {
+	file, err := os.Create(path)
+	if err == nil {
+		encoder := gob.NewEncoder(file)
+		encoder.Encode(object)
+	}
+	file.Close()
+	return err
+}
+
+// Decode Gob file
+func Load(path string, object interface{}) error {
+	file, err := os.Open(path)
+	if err == nil {
+		decoder := gob.NewDecoder(file)
+		err = decoder.Decode(object)
+	}
+	file.Close()
+	return err
 }

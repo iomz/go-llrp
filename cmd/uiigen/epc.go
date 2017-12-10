@@ -256,6 +256,11 @@ func MakeRuneSliceOfSGTIN96(cp string, fv string, ir string, s string) ([]byte, 
 	itemReference := GetItemReference(ir, SGTINPartitionTable[len(cp)])
 	serial := GetSerial(s, 38)
 
+	// FILTER
+	fmt.Println("FILTER 00110000" + string(filter) + string(partition) + string(companyPrefix) + "," + cp)
+	fmt.Println("FILTER 00110000" + string(filter) + string(partition) + string(companyPrefix) + string(itemReference) + "," + cp + "-" + ir)
+	// FILTER END
+
 	bs := append(filter, partition...)
 	bs = append(bs, companyPrefix...)
 	bs = append(bs, itemReference...)
