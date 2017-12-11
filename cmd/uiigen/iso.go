@@ -50,7 +50,7 @@ func MakeRuneSliceOfISO17363(oc string, ei string, csn string) ([]byte, int) {
 
 	// FILTER
 	fmt.Println("FILTER " + string(dataIdentifier) + string(ownerCode) + ",ISO17363_" + di + "-" + oc)
-	fmt.Println("FILTER " + string(dataIdentifier) + string(ownerCode) + string(containerSerialNumber) + ",ISO17363_" + di + "-" + oc + "-" + csn)
+	fmt.Println("FILTER " + string(dataIdentifier) + string(ownerCode) + string(equipmentIdentifier) + ",ISO17363_" + di + "-" + oc + "-" + ei)
 	// FILTER END
 
 	bs := append(dataIdentifier, ownerCode...)
