@@ -85,3 +85,30 @@ func TestMakeRuneSliceOfISO17365(t *testing.T) {
 		})
 	}
 }
+
+func TestPad6BitEncodingRuneSlice(t *testing.T) {
+	type args struct {
+		bs []rune
+	}
+	tests := []struct {
+		name  string
+		args  args
+		want  []rune
+		want1 int
+	}{
+		{"0000", args{[]rune("0000")}, []rune("0000100000100000"), 16},
+		{"0000000000000000", args{[]rune("0000000000000000")}, []rune("0000000000000000"), 16},
+		//{"", args{""}, []rune{""}, 16},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1 := Pad6BitEncodingRuneSlice(tt.args.bs)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Pad6BitEncodingRuneSlice() got = %v, want %v", string(got), string(tt.want))
+			}
+			if got1 != tt.want1 {
+				t.Errorf("Pad6BitEncodingRuneSlice() got1 = %v, want %v", got1, tt.want1)
+			}
+		})
+	}
+}

@@ -48,27 +48,21 @@ func MakeRuneSliceOfISO17363(oc string, ei string, csn string) ([]byte, int) {
 	}
 	containerSerialNumber := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(csn + fmt.Sprintf("%v", cd)))
 
-	var bs []rune
-	bs = append(bs, []rune(dataIdentifier)...)
-	bs = append(bs, ownerCode...)
+	// FILTER
+	fmt.Println("FILTER " + string(dataIdentifier) + string(ownerCode) + ",ISO17363_" + di + "-" + oc)
+	fmt.Println("FILTER " + string(dataIdentifier) + string(ownerCode) + string(containerSerialNumber) + ",ISO17363_" + di + "-" + oc + "-" + csn)
+	// FILTER END
+
+	bs := append(dataIdentifier, ownerCode...)
 	bs = append(bs, equipmentIdentifier...)
 	bs = append(bs, containerSerialNumber...)
 
-	length := len(dataIdentifier) + len(ownerCode) + len(equipmentIdentifier) + len(containerSerialNumber)
-	remainder := length % 16
-	var padding []rune
-	if remainder != 0 {
-		padRuneSlice := binutil.ParseDecimalStringToBinRuneSlice("32") // pad string "100000"
-		for i := 0; i < 16-remainder; i++ {
-			padding = append(padding, padRuneSlice[i%6])
-		}
-		bs = append(bs, padding...)
-		length += 16 - remainder
-	}
+	var length int
+	bs, length = Pad6BitEncodingRuneSlice(bs)
 
 	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
 	if err != nil {
-		fmt.Println("Something went wrong!")
+		fmt.Println("Something went wrong in MakeRuneSliceOfISO17363!")
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -88,13 +82,35 @@ func MakeRuneSliceOfISO17365(di string, iac string, cin string, sn string) ([]by
 	}
 	serialNumber := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(sn))
 
-	var bs []rune
-	bs = append(bs, []rune(dataIdentifier)...)
-	bs = append(bs, issuingAgencyCode...)
+	// FILTER
+	fmt.Println("FILTER " + string(dataIdentifier) + string(issuingAgencyCode) + ",ISO17365_" + di + "-" + iac)
+	fmt.Println("FILTER " + string(dataIdentifier) + string(issuingAgencyCode) + string(companyIdentification) + ",ISO17365_" + di + "-" + iac + "-" + cin)
+	// FILTER END
+
+	bs := append(dataIdentifier, issuingAgencyCode...)
 	bs = append(bs, companyIdentification...)
 	bs = append(bs, serialNumber...)
 
-	length := len(dataIdentifier) + len(issuingAgencyCode) + len(companyIdentification) + len(serialNumber)
+	var length int
+	bs, length = Pad6BitEncodingRuneSlice(bs)
+
+	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
+	if err != nil {
+		fmt.Println("Something went wrong in MakeRuneSliceOfISO17365!")
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	var iso17365 = []interface{}{p}
+
+	return binutil.Pack(iso17365), length
+}
+
+// Pad6BitEncodingRuneSlice returns a new length
+// and 16-bit (word-length) padded binary string in rune slice
+// @ISO15962
+func Pad6BitEncodingRuneSlice(bs []rune) ([]rune, int) {
+	length := len(bs)
 	remainder := length % 16
 	var padding []rune
 	if remainder != 0 {
@@ -105,15 +121,5 @@ func MakeRuneSliceOfISO17365(di string, iac string, cin string, sn string) ([]by
 		bs = append(bs, padding...)
 		length += 16 - remainder
 	}
-
-	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
-	if err != nil {
-		fmt.Println("Something went wrong!")
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	var iso17365 = []interface{}{p}
-
-	return binutil.Pack(iso17365), length
+	return bs, length
 }

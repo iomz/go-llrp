@@ -169,6 +169,11 @@ func MakeRuneSliceOfGIAI96(cp string, fv string, iar string) ([]byte, error) {
 	partition := []rune(fmt.Sprintf("%.3b", GIAIPartitionTable[len(cp)][PValue]))
 	indivisualAssetReference := GetIndivisualAssetReference(iar, GIAIPartitionTable[len(cp)])
 
+	// FILTER
+	fmt.Println("FILTER 00110100" + string(filter) + string(partition) + string(companyPrefix) + ",GIAI-96_" + cp)
+	fmt.Println("FILTER 00110100" + string(filter) + string(partition) + string(companyPrefix) + string(indivisualAssetReference) + ",GIAI-96_" + cp + "-" + iar)
+	// FILTER END
+
 	bs := append(filter, partition...)
 	bs = append(bs, companyPrefix...)
 	bs = append(bs, indivisualAssetReference...)
@@ -211,6 +216,11 @@ func MakeRuneSliceOfGRAI96(cp string, fv string, at string, s string) ([]byte, e
 	partition := []rune(fmt.Sprintf("%.3b", GRAIPartitionTable[len(cp)][PValue]))
 	assetType := GetAssetType(at, GRAIPartitionTable[len(cp)])
 	serial := GetSerial(s, 38)
+
+	// FILTER
+	fmt.Println("FILTER 00110011" + string(filter) + string(partition) + string(companyPrefix) + ",GRAI-96_" + cp)
+	fmt.Println("FILTER 00110011" + string(filter) + string(partition) + string(companyPrefix) + string(assetType) + ",GRAI-96_" + cp + "-" + at)
+	// FILTER END
 
 	bs := append(filter, partition...)
 	bs = append(bs, companyPrefix...)
@@ -257,8 +267,8 @@ func MakeRuneSliceOfSGTIN96(cp string, fv string, ir string, s string) ([]byte, 
 	serial := GetSerial(s, 38)
 
 	// FILTER
-	fmt.Println("FILTER 00110000" + string(filter) + string(partition) + string(companyPrefix) + "," + cp)
-	fmt.Println("FILTER 00110000" + string(filter) + string(partition) + string(companyPrefix) + string(itemReference) + "," + cp + "-" + ir)
+	fmt.Println("FILTER 00110000" + string(filter) + string(partition) + string(companyPrefix) + ",SGTIN-96_" + cp)
+	fmt.Println("FILTER 00110000" + string(filter) + string(partition) + string(companyPrefix) + string(itemReference) + ",SGTIN-96_" + cp + "-" + ir)
 	// FILTER END
 
 	bs := append(filter, partition...)
@@ -305,7 +315,12 @@ func MakeRuneSliceOfSSCC96(cp string, fv string, e string) ([]byte, error) {
 	// 24 '0's
 	reserved := binutil.GenerateNLengthZeroPaddingRuneSlice(24)
 
-	bs := append(filter, partition...)
+	// FILTER
+	fmt.Println("FILTER 00110001" + string(filter) + string(partition) + string(companyPrefix) + ",SSCC-96_" + cp)
+	fmt.Println("FILTER 00110001" + string(filter) + string(partition) + string(companyPrefix) + string(extension) + ",SSCC-96_" + cp + "-" + e)
+	// FILTER END
+
+bs := append(filter, partition...)
 	bs = append(bs, companyPrefix...)
 	bs = append(bs, extension...)
 	bs = append(bs, reserved...)
