@@ -122,15 +122,6 @@ func Parse6BinRuneSliceToRune(r []rune) (rune, error) {
 	return rune(i), nil
 }
 
-// ParseByteSliceToBinString returns run slice of bytes
-func ParseByteSliceToBinString(bys []byte) string {
-	bs := ""
-	for _, b := range bys {
-		bs += fmt.Sprintf("%.8b", b)
-	}
-	return bs
-}
-
 // ParseBinRuneSliceToUint8Slice returns uint8 slice from binary string
 // Precondition: len(bs) % 8 == 0
 func ParseBinRuneSliceToUint8Slice(bs []rune) ([]uint8, error) {
@@ -164,6 +155,15 @@ func ParseBinRuneSliceToInt(bs []rune) int {
 		panic(err)
 	}
 	return int(i)
+}
+
+// ParseByteSliceToBinString returns run slice of bytes
+func ParseByteSliceToBinString(bys []byte) string {
+	bs := ""
+	for _, b := range bys {
+		bs += fmt.Sprintf("%.8b", b)
+	}
+	return bs
 }
 
 // ParseDecimalStringToBinRuneSlice convert serial to binary rune slice
