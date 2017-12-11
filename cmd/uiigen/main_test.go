@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
 func TestCheckIfStringInSlice(t *testing.T) {
 	type args struct {
