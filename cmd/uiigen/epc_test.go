@@ -36,14 +36,14 @@ func TestGetCompanyPrefix(t *testing.T) {
 		args              args
 		wantCompanyPrefix []rune
 	}{
-		{"123456", args{"123456", SGTINPartitionTable},  []rune("00011110001001000000")},
+		{"123456", args{"123456", SGTINPartitionTable}, []rune("00011110001001000000")},
 		{"1234567", args{"1234567", SGTINPartitionTable}, []rune("000100101101011010000111")},
 		{"12345678", args{"12345678", SGTINPartitionTable}, []rune("000101111000110000101001110")},
 		{"123456789", args{"123456789", SGTINPartitionTable}, []rune("000111010110111100110100010101")},
 		{"1234567890", args{"1234567890", SGTINPartitionTable}, []rune("0001001001100101100000001011010010")},
 		{"12345678901", args{"12345678901", SGTINPartitionTable}, []rune("0001011011111110111000001110000110101")},
 		{"123456789012", args{"123456789012", SGTINPartitionTable}, []rune("0001110010111110100110010001101000010100")},
-  }
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotCompanyPrefix := GetCompanyPrefix(tt.args.cp, tt.args.pt); !reflect.DeepEqual(gotCompanyPrefix, tt.wantCompanyPrefix) {
@@ -174,7 +174,7 @@ func TestGetSerial(t *testing.T) {
 	}
 }
 
-func TestMakeRuneSliceOfGIAI96(t *testing.T) {
+func TestMakeGIAI96(t *testing.T) {
 	type args struct {
 		cp  string
 		fv  string
@@ -190,19 +190,19 @@ func TestMakeRuneSliceOfGIAI96(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := MakeRuneSliceOfGIAI96(tt.args.cp, tt.args.fv, tt.args.iar)
+			got, err := MakeGIAI96(tt.args.cp, tt.args.fv, tt.args.iar)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("MakeRuneSliceOfGIAI96() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("MakeGIAI96() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MakeRuneSliceOfGIAI96() = %v, want %v", got, tt.want)
+				t.Errorf("MakeGIAI96() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestMakeRuneSliceOfGRAI96(t *testing.T) {
+func TestMakeGRAI96(t *testing.T) {
 	type args struct {
 		cp string
 		fv string
@@ -219,19 +219,19 @@ func TestMakeRuneSliceOfGRAI96(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := MakeRuneSliceOfGRAI96(tt.args.cp, tt.args.fv, tt.args.at, tt.args.s)
+			got, err := MakeGRAI96(tt.args.cp, tt.args.fv, tt.args.at, tt.args.s)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("MakeRuneSliceOfGRAI96() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("MakeGRAI96() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MakeRuneSliceOfGRAI96() = %v, want %v", got, tt.want)
+				t.Errorf("MakeGRAI96() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestMakeRuneSliceOfSGTIN96(t *testing.T) {
+func TestMakeSGTIN96(t *testing.T) {
 	type args struct {
 		cp string
 		fv string
@@ -248,19 +248,19 @@ func TestMakeRuneSliceOfSGTIN96(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := MakeRuneSliceOfSGTIN96(tt.args.cp, tt.args.fv, tt.args.ir, tt.args.s)
+			got, err := MakeSGTIN96(tt.args.cp, tt.args.fv, tt.args.ir, tt.args.s)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("MakeRuneSliceOfSGTIN96() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("MakeSGTIN96() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MakeRuneSliceOfSGTIN96() = %v, want %v", got, tt.want)
+				t.Errorf("MakeSGTIN96() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestMakeRuneSliceOfSSCC96(t *testing.T) {
+func TestMakeSSCC96(t *testing.T) {
 	type args struct {
 		cp string
 		fv string
@@ -276,13 +276,13 @@ func TestMakeRuneSliceOfSSCC96(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := MakeRuneSliceOfSSCC96(tt.args.cp, tt.args.fv, tt.args.e)
+			got, err := MakeSSCC96(tt.args.cp, tt.args.fv, tt.args.e)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("MakeRuneSliceOfSSCC96() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("MakeSSCC96() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MakeRuneSliceOfSSCC96() = %v, want %v", got, tt.want)
+				t.Errorf("MakeSSCC96() = %v, want %v", got, tt.want)
 			}
 		})
 	}

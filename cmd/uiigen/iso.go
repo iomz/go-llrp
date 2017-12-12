@@ -4,7 +4,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/iomz/go-llrp/binutil"
@@ -13,7 +12,7 @@ import (
 // GetISO6346CD returns check digit for container serial number
 func GetISO6346CD(cn string) (int, error) {
 	if len(cn) != 10 {
-		return 0, errors.New("Invalid ISO6346 code provided!")
+		return 0, errors.New("Invalid ISO6346 code provided")
 	}
 	cn = strings.ToUpper(cn)
 	n := 0.0
@@ -25,8 +24,8 @@ func GetISO6346CD(cn string) (int, error) {
 	return (int(n) - int(n/11)*11) % 10, nil
 }
 
-// MakeRuneSliceOfISO17363 generates a random 17363 code
-func MakeRuneSliceOfISO17363(oc string, ei string, csn string) ([]byte, int) {
+// MakeISO17363 generates a random 17363 code
+func MakeISO17363(oc string, ei string, csn string) ([]byte, int, error) {
 	di := "7B"
 	dataIdentifier := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(di))
 	if oc == "" {
@@ -40,11 +39,11 @@ func MakeRuneSliceOfISO17363(oc string, ei string, csn string) ([]byte, int) {
 		leftPadding := binutil.GenerateNLengthZeroPaddingRuneSlice(6 - len(csn))
 		csn = string(leftPadding) + csn
 	} else if 6 < len(csn) {
-		panic("Invalid csn: " + csn)
+		return []byte{}, 0, errors.New("Invalid csn: " + csn)
 	}
 	cd, err := GetISO6346CD(oc + ei + csn)
 	if err != nil {
-		panic(err)
+		return []byte{}, 0, err
 	}
 	containerSerialNumber := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(csn + fmt.Sprintf("%v", cd)))
 
@@ -62,18 +61,16 @@ func MakeRuneSliceOfISO17363(oc string, ei string, csn string) ([]byte, int) {
 
 	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
 	if err != nil {
-		fmt.Println("Something went wrong in MakeRuneSliceOfISO17363!")
-		fmt.Println(err)
-		os.Exit(1)
+		return []byte{}, 0, err
 	}
 
 	var iso17363 = []interface{}{p}
 
-	return binutil.Pack(iso17363), length
+	return binutil.Pack(iso17363), length, nil
 }
 
-// MakeRuneSliceOfISO17365 generates a random 17367 code
-func MakeRuneSliceOfISO17365(di string, iac string, cin string, sn string) ([]byte, int) {
+// MakeISO17365 generates a random 17367 code
+func MakeISO17365(di string, iac string, cin string, sn string) ([]byte, int, error) {
 	dataIdentifier := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(di))
 	issuingAgencyCode := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(iac))
 	companyIdentification := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(cin))
@@ -96,14 +93,12 @@ func MakeRuneSliceOfISO17365(di string, iac string, cin string, sn string) ([]by
 
 	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
 	if err != nil {
-		fmt.Println("Something went wrong in MakeRuneSliceOfISO17365!")
-		fmt.Println(err)
-		os.Exit(1)
+		return []byte{}, 0, err
 	}
 
 	var iso17365 = []interface{}{p}
 
-	return binutil.Pack(iso17365), length
+	return binutil.Pack(iso17365), length, nil
 }
 
 // Pad6BitEncodingRuneSlice returns a new length

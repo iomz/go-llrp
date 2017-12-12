@@ -26,38 +26,6 @@ func TestCheckIfStringInSlice(t *testing.T) {
 	}
 }
 
-func TestMakeEPC(t *testing.T) {
-	tests := []struct {
-		name string
-		want string
-	}{
-	// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := MakeEPC(); got != tt.want {
-				t.Errorf("MakeEPC() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestMakeISO(t *testing.T) {
-	tests := []struct {
-		name string
-		want string
-	}{
-	// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := MakeISO(); got != tt.want {
-				t.Errorf("MakeISO() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }

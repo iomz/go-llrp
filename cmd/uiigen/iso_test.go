@@ -31,34 +31,39 @@ func TestGetISO6346CD(t *testing.T) {
 	}
 }
 
-func TestMakeRuneSliceOfISO17363(t *testing.T) {
+func TestMakeISO17363(t *testing.T) {
 	type args struct {
 		oc  string
 		ei  string
 		csn string
 	}
 	tests := []struct {
-		name  string
-		args  args
-		want  []byte
-		want1 int
+		name    string
+		args    args
+		want    []byte
+		want1   int
+		wantErr bool
 	}{
-		{"A97BCSQU3054383", args{"CSQ", "U", "305438"}, []byte{220, 32, 211, 69, 92, 240, 215, 76, 248, 206}, 80},
+		{"A97BCSQU3054383", args{"CSQ", "U", "305438"}, []byte{220, 32, 211, 69, 92, 240, 215, 76, 248, 206}, 80, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := MakeRuneSliceOfISO17363(tt.args.oc, tt.args.ei, tt.args.csn)
+			got, got1, err := MakeISO17363(tt.args.oc, tt.args.ei, tt.args.csn)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("MakeISO17363() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MakeRuneSliceOfISO17363() got = %v, want %v", got, tt.want)
+				t.Errorf("MakeISO17363() got = %v, want %v", got, tt.want)
 			}
 			if got1 != tt.want1 {
-				t.Errorf("MakeRuneSliceOfISO17363() got1 = %v, want %v", got1, tt.want1)
+				t.Errorf("MakeISO17363() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}
 }
 
-func TestMakeRuneSliceOfISO17365(t *testing.T) {
+func TestMakeISO17365(t *testing.T) {
 	type args struct {
 		di  string
 		iac string
@@ -66,21 +71,26 @@ func TestMakeRuneSliceOfISO17365(t *testing.T) {
 		sn  string
 	}
 	tests := []struct {
-		name  string
-		args  args
-		want  []byte
-		want1 int
+		name    string
+		args    args
+		want    []byte
+		want1   int
+		wantErr bool
 	}{
-		{"", args{"25S", "UN", "043325711", "MH8031200000000001"}, []byte{203, 84, 213, 59, 13, 51, 207, 45, 119, 199, 19, 72, 227, 12, 241, 203, 12, 48, 195, 12, 48, 195, 12, 49}, 192},
+		{"25SUN043325711MH8031200000000001", args{"25S", "UN", "043325711", "MH8031200000000001"}, []byte{203, 84, 213, 59, 13, 51, 207, 45, 119, 199, 19, 72, 227, 12, 241, 203, 12, 48, 195, 12, 48, 195, 12, 49}, 192, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := MakeRuneSliceOfISO17365(tt.args.di, tt.args.iac, tt.args.cin, tt.args.sn)
+			got, got1, err := MakeISO17365(tt.args.di, tt.args.iac, tt.args.cin, tt.args.sn)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("MakeISO17365() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MakeRuneSliceOfISO17365() got = %v, want %v", got, tt.want)
+				t.Errorf("MakeISO17365() got = %v, want %v", got, tt.want)
 			}
 			if got1 != tt.want1 {
-				t.Errorf("MakeRuneSliceOfISO17365() got1 = %v, want %v", got1, tt.want1)
+				t.Errorf("MakeISO17365() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}
