@@ -30,8 +30,8 @@ const (
 	IARDigits
 )
 
-// GIAIPartitionTable is PT for GIAI
-var GIAIPartitionTable = PartitionTable{
+// GIAI96PartitionTable is PT for GIAI
+var GIAI96PartitionTable = PartitionTable{
 	12: {PValue: 0, CPBits: 40, IARBits: 42, IARDigits: 13},
 	11: {PValue: 1, CPBits: 37, IARBits: 45, IARDigits: 14},
 	10: {PValue: 2, CPBits: 34, IARBits: 48, IARDigits: 15},
@@ -41,8 +41,8 @@ var GIAIPartitionTable = PartitionTable{
 	6:  {PValue: 6, CPBits: 20, IARBits: 62, IARDigits: 19},
 }
 
-// GRAIPartitionTable is PT for GRAI
-var GRAIPartitionTable = PartitionTable{
+// GRAI96PartitionTable is PT for GRAI
+var GRAI96PartitionTable = PartitionTable{
 	12: {PValue: 0, CPBits: 40, ATBits: 4, ATDigits: 0},
 	11: {PValue: 1, CPBits: 37, ATBits: 7, ATDigits: 1},
 	10: {PValue: 2, CPBits: 34, ATBits: 10, ATDigits: 2},
@@ -52,8 +52,8 @@ var GRAIPartitionTable = PartitionTable{
 	6:  {PValue: 6, CPBits: 20, ATBits: 24, ATDigits: 6},
 }
 
-// SGTINPartitionTable is PT for SGTIN
-var SGTINPartitionTable = PartitionTable{
+// SGTIN96PartitionTable is PT for SGTIN
+var SGTIN96PartitionTable = PartitionTable{
 	12: {PValue: 0, CPBits: 40, IRBits: 4, IRDigits: 1},
 	11: {PValue: 1, CPBits: 37, IRBits: 7, IRDigits: 2},
 	10: {PValue: 2, CPBits: 34, IRBits: 10, IRDigits: 3},
@@ -63,8 +63,8 @@ var SGTINPartitionTable = PartitionTable{
 	6:  {PValue: 6, CPBits: 20, IRBits: 24, IRDigits: 7},
 }
 
-// SSCCPartitionTable is PT for SSCC
-var SSCCPartitionTable = PartitionTable{
+// SSCC96PartitionTable is PT for SSCC
+var SSCC96PartitionTable = PartitionTable{
 	12: {PValue: 0, CPBits: 40, EBits: 18, EDigits: 5},
 	11: {PValue: 1, CPBits: 37, EBits: 21, EDigits: 6},
 	10: {PValue: 2, CPBits: 34, EBits: 24, EDigits: 7},
@@ -96,8 +96,6 @@ func GetCompanyPrefix(cp string, pt PartitionTable) (companyPrefix []rune) {
 			leftPadding := binutil.GenerateNLengthZeroPaddingRuneSlice(pt[len(cp)][CPBits] - len(companyPrefix))
 			companyPrefix = append(leftPadding, companyPrefix...)
 		}
-	} else {
-		companyPrefix, _ = binutil.GenerateNLengthRandomBinRuneSlice(pt[len(cp)][CPBits], uint(math.Pow(float64(10), float64(len(cp)))))
 	}
 	return
 }
@@ -171,28 +169,46 @@ func GetSerial(s string, serialLength int) (serial []rune) {
 }
 
 // MakeGIAI96 generates GIAI-96
-func MakeGIAI96(cp string, fv string, iar string) ([]byte, error) {
+func MakeGIAI96(pf bool, fv string, cp string, iar string) ([]byte, string, string, error) {
 	filter := GetFilter(fv)
-	companyPrefix := GetCompanyPrefix(cp, GIAIPartitionTable)
-	partition := []rune(fmt.Sprintf("%.3b", GIAIPartitionTable[len(cp)][PValue]))
-	indivisualAssetReference := GetIndivisualAssetReference(iar, GIAIPartitionTable[len(cp)])
+	if fv == "" {
+		fv = strconv.Itoa(binutil.ParseBinRuneSliceToInt(filter))
+	}
 
-	// FILTER
-	fmt.Println("FILTER 00110100" + string(filter) + string(partition) + string(companyPrefix) + ",GIAI-96_" + cp)
-	fmt.Println("FILTER 00110100" + string(filter) + string(partition) + string(companyPrefix) + string(indivisualAssetReference) + ",GIAI-96_" + cp + "-" + iar)
-	// FILTER END
+	// CP
+	if cp == "" {
+		if pf {
+			return []byte{}, "00110100" + string(filter), "GIAI-96_" + fv, nil
+		}
+		return []byte{}, "", "", errors.New("companyPrefix is empty")
+	}
+	companyPrefix := GetCompanyPrefix(cp, GIAI96PartitionTable)
+	partition := []rune(fmt.Sprintf("%.3b", GIAI96PartitionTable[len(cp)][PValue]))
+
+	// IAR
+	if iar == "" {
+		if pf {
+			return []byte{}, "00110100" + string(filter) + string(partition) + string(companyPrefix), "GIAI-96_" + fv + "_" + strconv.Itoa(GIAI96PartitionTable[len(cp)][PValue]) + "_" + cp, nil
+		}
+	}
+	indivisualAssetReference := GetIndivisualAssetReference(iar, GIAI96PartitionTable[len(cp)])
+
+	// Exact match
+	if pf {
+		return []byte{}, "00110100" + string(filter) + string(partition) + string(companyPrefix) + string(indivisualAssetReference), "GIAI-96_" + fv + "_" + strconv.Itoa(GIAI96PartitionTable[len(cp)][PValue]) + "_" + cp + "_" + iar, nil
+	}
 
 	bs := append(filter, partition...)
 	bs = append(bs, companyPrefix...)
 	bs = append(bs, indivisualAssetReference...)
 
 	if len(bs) != 88 {
-		return []byte{}, errors.New("len(bs): " + string(len(bs)))
+		return []byte{}, "", "", errors.New("len(bs): " + string(len(bs)))
 	}
 
 	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, "", "", err
 	}
 
 	var giai96 = []interface{}{
@@ -210,21 +226,43 @@ func MakeGIAI96(cp string, fv string, iar string) ([]byte, error) {
 		p[10],     // 8 bits -> 96 bits
 	}
 
-	return binutil.Pack(giai96), nil
+	return binutil.Pack(giai96), "", "", nil
 }
 
 // MakeGRAI96 generates GRAI-96
-func MakeGRAI96(cp string, fv string, at string, s string) ([]byte, error) {
+func MakeGRAI96(pf bool, fv string, cp string, at string, ser string) ([]byte, string, string, error) {
 	filter := GetFilter(fv)
-	companyPrefix := GetCompanyPrefix(cp, GRAIPartitionTable)
-	partition := []rune(fmt.Sprintf("%.3b", GRAIPartitionTable[len(cp)][PValue]))
-	assetType := GetAssetType(at, GRAIPartitionTable[len(cp)])
-	serial := GetSerial(s, 38)
 
-	// FILTER
-	fmt.Println("FILTER 00110011" + string(filter) + string(partition) + string(companyPrefix) + ",GRAI-96_" + cp)
-	fmt.Println("FILTER 00110011" + string(filter) + string(partition) + string(companyPrefix) + string(assetType) + ",GRAI-96_" + cp + "-" + at)
-	// FILTER END
+	//CP
+	if cp == "" {
+		if pf {
+			return []byte{}, "00110011" + string(filter), "GRAI-96_" + fv, nil
+		}
+		return []byte{}, "", "", errors.New("companyPrefix is empty")
+	}
+	companyPrefix := GetCompanyPrefix(cp, GRAI96PartitionTable)
+	partition := []rune(fmt.Sprintf("%.3b", GRAI96PartitionTable[len(cp)][PValue]))
+
+	//AT
+	if at == "" {
+		if pf {
+			return []byte{}, "00110011" + string(filter) + string(partition) + string(companyPrefix), "GRAI-96_" + fv + "_" + strconv.Itoa(GRAI96PartitionTable[len(cp)][PValue]) + "_" + cp, nil
+		}
+	}
+	assetType := GetAssetType(at, GRAI96PartitionTable[len(cp)])
+
+	// SER
+	if ser == "" {
+		if pf {
+			return []byte{}, "00110011" + string(filter) + string(partition) + string(companyPrefix) + string(assetType), "GRAI-96_" + fv + "_" + strconv.Itoa(GRAI96PartitionTable[len(cp)][PValue]) + "_" + cp + "_" + at, nil
+		}
+	}
+	serial := GetSerial(ser, 38)
+
+	// Exact match
+	if pf {
+		return []byte{}, "00110011" + string(filter) + string(partition) + string(companyPrefix) + string(assetType) + string(serial), "GRAI-96_" + fv + "_" + strconv.Itoa(GRAI96PartitionTable[len(cp)][PValue]) + "_" + cp + "_" + at + "_" + ser, nil
+	}
 
 	bs := append(filter, partition...)
 	bs = append(bs, companyPrefix...)
@@ -232,12 +270,12 @@ func MakeGRAI96(cp string, fv string, at string, s string) ([]byte, error) {
 	bs = append(bs, serial...)
 
 	if len(bs) != 88 {
-		return []byte{}, errors.New("len(bs): " + string(len(bs)))
+		return []byte{}, "", "", errors.New("len(bs): " + string(len(bs)))
 	}
 
 	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, "", "", err
 	}
 
 	var grai96 = []interface{}{
@@ -255,21 +293,42 @@ func MakeGRAI96(cp string, fv string, at string, s string) ([]byte, error) {
 		p[10],     // 8 bits -> 96 bits
 	}
 
-	return binutil.Pack(grai96), nil
+	return binutil.Pack(grai96), "", "", nil
 }
 
 // MakeSGTIN96 generates SGTIN-96
-func MakeSGTIN96(cp string, fv string, ir string, s string) ([]byte, error) {
+func MakeSGTIN96(pf bool, fv string, cp string, ir string, ser string) ([]byte, string, string, error) {
 	filter := GetFilter(fv)
-	companyPrefix := GetCompanyPrefix(cp, SGTINPartitionTable)
-	partition := []rune(fmt.Sprintf("%.3b", SGTINPartitionTable[len(cp)][PValue]))
-	itemReference := GetItemReference(ir, SGTINPartitionTable[len(cp)])
-	serial := GetSerial(s, 38)
+	// CP
+	if cp == "" {
+		if pf {
+			return []byte{}, "00110000" + string(filter), "SGTIN-96_" + fv, nil
+		}
+		return []byte{}, "", "", errors.New("companyPrefix is empty")
+	}
+	companyPrefix := GetCompanyPrefix(cp, SGTIN96PartitionTable)
+	partition := []rune(fmt.Sprintf("%.3b", SGTIN96PartitionTable[len(cp)][PValue]))
 
-	// FILTER
-	fmt.Println("FILTER 00110000" + string(filter) + string(partition) + string(companyPrefix) + ",SGTIN-96_" + cp)
-	fmt.Println("FILTER 00110000" + string(filter) + string(partition) + string(companyPrefix) + string(itemReference) + ",SGTIN-96_" + cp + "-" + ir)
-	// FILTER END
+	// IR
+	if ir == "" {
+		if pf {
+			return []byte{}, "00110000" + string(filter) + string(partition) + string(companyPrefix), "SGTIN-96_" + fv + "_" + strconv.Itoa(SGTIN96PartitionTable[len(cp)][PValue]) + "_" + cp, nil
+		}
+	}
+	itemReference := GetItemReference(ir, SGTIN96PartitionTable[len(cp)])
+
+	// SER
+	if ser == "" {
+		if pf {
+			return []byte{}, "00110000" + string(filter) + string(partition) + string(companyPrefix) + string(itemReference), "SGTIN-96_" + fv + "_" + strconv.Itoa(SGTIN96PartitionTable[len(cp)][PValue]) + "_" + cp + "_" + ir, nil
+		}
+	}
+	serial := GetSerial(ser, 38)
+
+	// Exact match
+	if pf {
+		return []byte{}, "00110000" + string(filter) + string(partition) + string(companyPrefix) + string(itemReference) + string(serial), "SGTIN-96_" + fv + "_" + strconv.Itoa(SGTIN96PartitionTable[len(cp)][PValue]) + "_" + cp + "_" + ir + "_" + ser, nil
+	}
 
 	bs := append(filter, partition...)
 	bs = append(bs, companyPrefix...)
@@ -277,12 +336,12 @@ func MakeSGTIN96(cp string, fv string, ir string, s string) ([]byte, error) {
 	bs = append(bs, serial...)
 
 	if len(bs) != 88 {
-		return []byte{}, errors.New("len(bs): " + string(len(bs)))
+		return []byte{}, "", "", errors.New("len(bs): " + string(len(bs)))
 	}
 
 	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, "", "", err
 	}
 
 	var sgtin96 = []interface{}{
@@ -300,23 +359,37 @@ func MakeSGTIN96(cp string, fv string, ir string, s string) ([]byte, error) {
 		p[10],     // 8 bits -> 96 bits
 	}
 
-	return binutil.Pack(sgtin96), nil
+	return binutil.Pack(sgtin96), "", "", nil
 }
 
 // MakeSSCC96 generates SSCC-96
-func MakeSSCC96(cp string, fv string, e string) ([]byte, error) {
+func MakeSSCC96(pf bool, fv string, cp string, ext string) ([]byte, string, string, error) {
 	filter := GetFilter(fv)
-	companyPrefix := GetCompanyPrefix(cp, SSCCPartitionTable)
-	partition := []rune(fmt.Sprintf("%.3b", SSCCPartitionTable[len(cp)][PValue]))
-	extension := GetExtension(e, SSCCPartitionTable[len(cp)])
+	// CP
+	if cp == "" {
+		if pf {
+			return []byte{}, "00110001" + string(filter), "SSCC-96_" + fv, nil
+		}
+		return []byte{}, "", "", errors.New("companyPrefix is empty")
+	}
+	companyPrefix := GetCompanyPrefix(cp, SSCC96PartitionTable)
+	partition := []rune(fmt.Sprintf("%.3b", SSCC96PartitionTable[len(cp)][PValue]))
+
+	// EXT
+	if ext == "" {
+		if pf {
+			return []byte{}, "00110001" + string(filter) + string(partition) + string(companyPrefix), "SSCC-96_" + fv + "_" + strconv.Itoa(SSCC96PartitionTable[len(cp)][PValue]) + "_" + cp, nil
+		}
+	}
+	extension := GetExtension(ext, SSCC96PartitionTable[len(cp)])
+
+	// Exact match (ignore rsvd
+	if pf {
+		return []byte{}, "00110001" + string(filter) + string(partition) + string(companyPrefix) + string(extension), "SSCC-96_" + fv + "_" + strconv.Itoa(SSCC96PartitionTable[len(cp)][PValue]) + "_" + cp + "_" + ext, nil
+	}
 
 	// 24 '0's
 	reserved := binutil.GenerateNLengthZeroPaddingRuneSlice(24)
-
-	// FILTER
-	fmt.Println("FILTER 00110001" + string(filter) + string(partition) + string(companyPrefix) + ",SSCC-96_" + cp)
-	fmt.Println("FILTER 00110001" + string(filter) + string(partition) + string(companyPrefix) + string(extension) + ",SSCC-96_" + cp + "-" + e)
-	// FILTER END
 
 	bs := append(filter, partition...)
 	bs = append(bs, companyPrefix...)
@@ -324,12 +397,12 @@ func MakeSSCC96(cp string, fv string, e string) ([]byte, error) {
 	bs = append(bs, reserved...)
 
 	if len(bs) != 88 {
-		return []byte{}, errors.New("len(bs): " + string(len(bs)))
+		return []byte{}, "", "", errors.New("len(bs): " + string(len(bs)))
 	}
 
 	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, "", "", err
 	}
 
 	var sscc96 = []interface{}{
@@ -347,5 +420,5 @@ func MakeSSCC96(cp string, fv string, e string) ([]byte, error) {
 		p[10],     // 8 bits -> 96 bits
 	}
 
-	return binutil.Pack(sscc96), nil
+	return binutil.Pack(sscc96), "", "", nil
 }

@@ -14,8 +14,8 @@ import (
 
 var (
 	// kingpin app
-	app             = kingpin.New("uiigen", "A tool to generate an arbitrary UII (aka EPC).")
-	appPrefixFilter = app.Flag("prefixFilter", "Print a prefix filter for the given parameter").Default("false").Bool()
+	app          = kingpin.New("uiigen", "A tool to generate an arbitrary UII (aka EPC).")
+	prefixFilter = app.Flag("pf", "Print a prefix filter for the given parameter").Default("false").Bool()
 
 	// kingpin generate EPC mode
 	epc = app.Command("epc", "Generate an EPC.")
@@ -37,7 +37,7 @@ var (
 	isoEquipmentCategoryIdentifier = iso17363.Flag("ei", "A one letter equipment category identifier (EI) in ISO 6346 = U, J or Z.").Default("U").String()
 	isoContainerSerialNumber       = iso17363.Flag("csn", "A six digit serial number (CSN). ex.) 305438").String()
 	iso17365                       = iso.Command("17365", "ISO 17365 coding scheme.")
-	isoDataIdeintifier             = iso17365.Flag("di", "Data Identifier in ISO/IEC 15418. ex.) 25S").String()
+	isoDataIdeintifier             = iso17365.Flag("di", "Data Identifier in ISO/IEC 15418. ex.) 25S").Default("25S").String()
 	isoIssuingAgencyCode           = iso17365.Flag("iac", "1-3 Alphabet letters for Issuing Agency Code in ISO 15459. ex.) UN or OD").String()
 	isoCompanyIdentification       = iso17365.Flag("cin", "Company Identification. ex.) 043325711 or CIN1").String()
 	isoSerialNumber                = iso17365.Flag("sn", "Serial Number for ISO UII. ex.) MH8031200000000001 or 0000000RTIA1B2C3DOSN12345").String()
@@ -54,23 +54,26 @@ func CheckIfStringInSlice(a string, list []string) bool {
 	return false
 }
 
-// MakeEPC generates EPC in binary string and PC in hex string
-func MakeEPC(cs string, filter string, cp string, ir string, ext string, ser string, iar string, at string) (string, string) {
+// MakeEPC generates EPC in binary string and PC in hex string or prefix and elements
+func MakeEPC(pf bool, cs string, fv string, cp string, ir string, ext string, ser string, iar string, at string) (string, string) {
 	var uii []byte
-	var err error
+	var f string
+	var elem string
 
 	switch strings.ToUpper(cs) {
 	case "GIAI-96":
-		uii, err = MakeGIAI96(cp, filter, iar)
+		uii, f, elem, _ = MakeGIAI96(pf, fv, cp, iar)
 	case "GRAI-96":
-		uii, err = MakeGRAI96(cp, filter, at, ser)
+		uii, f, elem, _ = MakeGRAI96(pf, fv, cp, at, ser)
 	case "SGTIN-96":
-		uii, err = MakeSGTIN96(cp, filter, ir, ser)
+		uii, f, elem, _ = MakeSGTIN96(pf, fv, cp, ir, ser)
 	case "SSCC-96":
-		uii, err = MakeSSCC96(cp, filter, ext)
+		uii, f, elem, _ = MakeSSCC96(pf, fv, cp, ext)
 	}
-	if err != nil {
-		panic(err)
+
+	// If only prefix flag is on, return prefix as epc
+	if pf {
+		return f, elem
 	}
 
 	// TODO: update pc when length changed (for non-96-bit codes)
@@ -88,25 +91,28 @@ func MakeEPC(cs string, filter string, cp string, ir string, ext string, ser str
 	*/
 }
 
-// MakeISO returns ISO UII in binary string and PCbits in hex
-func MakeISO(std string, oc string, ei string, csn string, di string, iac string, cin string, sn string) (string, string) {
+// MakeISO returns ISO UII in binary string and PCbits in hex string or prefix and elements
+func MakeISO(pf bool, std string, oc string, ei string, csn string, di string, iac string, cin string, sn string) (string, string) {
 	var uii []byte
 	var pc []byte
 	var length int
-	var err error
+	var f string
+	var elem string
 
 	switch std {
 	case "17363":
 		afi := "A9" // 0xA9 ISO 17363 freight containers
-		uii, length, err = MakeISO17363(oc, ei, csn)
+		uii, length, f, elem, _ = MakeISO17363(pf, oc, ei, csn)
 		pc = MakeISOPC(length, afi)
 	case "17365":
 		afi := "A2" // 0xA2 ISO 17365 transport uit
-		uii, length, err = MakeISO17365(di, iac, cin, sn)
+		uii, length, f, elem, _ = MakeISO17365(pf, di, iac, cin, sn)
 		pc = MakeISOPC(length, afi)
 	}
-	if err != nil {
-		panic(err)
+
+	// If only prefix flag is on, return prefix as iso uii
+	if pf {
+		return f, elem
 	}
 
 	uiibs, _ := binutil.ParseHexStringToBinString(hex.EncodeToString(uii))
@@ -138,17 +144,17 @@ func MakeISOPC(length int, afi string) []byte {
 func main() {
 	parse := kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	var uii string
-	var pc string
+	var bs string
+	var opt string
 	switch parse {
 	case epc.FullCommand():
-		uii, pc = MakeEPC(*epcScheme, *epcFilter, *epcCompanyPrefix, *epcItemReference, *epcExtension, *epcSerial, *epcIndivisualAssetReference, *epcAssetType)
+		bs, opt = MakeEPC(*prefixFilter, *epcScheme, *epcFilter, *epcCompanyPrefix, *epcItemReference, *epcExtension, *epcSerial, *epcIndivisualAssetReference, *epcAssetType)
 	case iso17363.FullCommand():
-		uii, pc = MakeISO("17363", *isoOwnerCode, *isoEquipmentCategoryIdentifier, *isoContainerSerialNumber, *isoDataIdeintifier, *isoIssuingAgencyCode, *isoCompanyIdentification, *isoSerialNumber)
+		bs, opt = MakeISO(*prefixFilter, "17363", *isoOwnerCode, *isoEquipmentCategoryIdentifier, *isoContainerSerialNumber, *isoDataIdeintifier, *isoIssuingAgencyCode, *isoCompanyIdentification, *isoSerialNumber)
 	case iso17365.FullCommand():
-		uii, pc = MakeISO("17365", *isoOwnerCode, *isoEquipmentCategoryIdentifier, *isoContainerSerialNumber, *isoDataIdeintifier, *isoIssuingAgencyCode, *isoCompanyIdentification, *isoSerialNumber)
+		bs, opt = MakeISO(*prefixFilter, "17365", *isoOwnerCode, *isoEquipmentCategoryIdentifier, *isoContainerSerialNumber, *isoDataIdeintifier, *isoIssuingAgencyCode, *isoCompanyIdentification, *isoSerialNumber)
 	}
-	if len(uii) != 0 {
-		fmt.Println(pc + "," + uii)
+	if len(bs) != 0 {
+		fmt.Println(opt + "," + bs)
 	}
 }

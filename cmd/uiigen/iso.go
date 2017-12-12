@@ -25,32 +25,50 @@ func GetISO6346CD(cn string) (int, error) {
 }
 
 // MakeISO17363 generates a random 17363 code
-func MakeISO17363(oc string, ei string, csn string) ([]byte, int, error) {
+func MakeISO17363(pf bool, oc string, ei string, csn string) ([]byte, int, string, string, error) {
 	di := "7B"
 	dataIdentifier := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(di))
+
+	// OC
 	if oc == "" {
+		if pf {
+			return []byte{}, 0, string(dataIdentifier), "ISO17363_" + di, nil
+		}
 		oc = binutil.GenerateNLengthAlphabetString(3)
 	}
 	ownerCode := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(oc))
+
+	// EI
+	if ei == "" {
+		if pf {
+			return []byte{}, 0, string(dataIdentifier) + string(ownerCode), "ISO17363_" + di + "_" + oc, nil
+		}
+		ei = "U"
+	}
 	equipmentIdentifier := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(ei))
+
+	// CSN
 	if csn == "" {
+		if pf {
+			return []byte{}, 0, string(dataIdentifier) + string(ownerCode) + string(equipmentIdentifier), "ISO17363_" + di + "_" + oc + "_" + ei, nil
+		}
 		csn = binutil.GenerateNLengthDigitString(6)
 	} else if 6 > len(csn) {
 		leftPadding := binutil.GenerateNLengthZeroPaddingRuneSlice(6 - len(csn))
 		csn = string(leftPadding) + csn
 	} else if 6 < len(csn) {
-		return []byte{}, 0, errors.New("Invalid csn: " + csn)
+		return []byte{}, 0, "", "", errors.New("Invalid csn: " + csn)
 	}
 	cd, err := GetISO6346CD(oc + ei + csn)
 	if err != nil {
-		return []byte{}, 0, err
+		return []byte{}, 0, "", "", err
 	}
 	containerSerialNumber := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(csn + fmt.Sprintf("%v", cd)))
 
-	// FILTER
-	fmt.Println("FILTER " + string(dataIdentifier) + string(ownerCode) + ",ISO17363_" + di + "-" + oc)
-	fmt.Println("FILTER " + string(dataIdentifier) + string(ownerCode) + string(equipmentIdentifier) + ",ISO17363_" + di + "-" + oc + "-" + ei)
-	// FILTER END
+	// Exact match filter
+	if pf {
+		return []byte{}, 0, string(dataIdentifier) + string(ownerCode) + string(equipmentIdentifier) + string(containerSerialNumber), "ISO17363_" + di + "_" + oc + "_" + ei + "_" + csn, nil
+	}
 
 	bs := append(dataIdentifier, ownerCode...)
 	bs = append(bs, equipmentIdentifier...)
@@ -61,28 +79,49 @@ func MakeISO17363(oc string, ei string, csn string) ([]byte, int, error) {
 
 	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
 	if err != nil {
-		return []byte{}, 0, err
+		return []byte{}, 0, "", "", err
 	}
 
 	var iso17363 = []interface{}{p}
 
-	return binutil.Pack(iso17363), length, nil
+	return binutil.Pack(iso17363), length, "", "", nil
 }
 
 // MakeISO17365 generates a random 17367 code
-func MakeISO17365(di string, iac string, cin string, sn string) ([]byte, int, error) {
+func MakeISO17365(pf bool, di string, iac string, cin string, sn string) ([]byte, int, string, string, error) {
 	dataIdentifier := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(di))
+
+	// IAC
+	if iac == "" {
+		if pf {
+			return []byte{}, 0, string(dataIdentifier), "ISO17365_" + di, nil
+		}
+		return []byte{}, 0, "", "", errors.New("IAC not provided")
+	}
 	issuingAgencyCode := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(iac))
+
+	// CIN
+	if cin == "" {
+		if pf {
+			return []byte{}, 0, string(dataIdentifier) + string(issuingAgencyCode), "ISO17365_" + di + "_" + iac, nil
+		}
+		return []byte{}, 0, "", "", errors.New("CIN not provided")
+	}
 	companyIdentification := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(cin))
+
+	// SN
 	if sn == "" {
+		if pf {
+			return []byte{}, 0, string(dataIdentifier) + string(issuingAgencyCode) + string(companyIdentification), "ISO17365_" + di + "_" + iac + "_" + cin, nil
+		}
 		sn = binutil.GenerateNLengthHexString(18)
 	}
 	serialNumber := binutil.ParseRuneSliceTo6BinRuneSlice([]rune(sn))
 
-	// FILTER
-	fmt.Println("FILTER " + string(dataIdentifier) + string(issuingAgencyCode) + ",ISO17365_" + di + "-" + iac)
-	fmt.Println("FILTER " + string(dataIdentifier) + string(issuingAgencyCode) + string(companyIdentification) + ",ISO17365_" + di + "-" + iac + "-" + cin)
-	// FILTER END
+	// Exact match filter
+	if pf {
+		return []byte{}, 0, string(dataIdentifier) + string(issuingAgencyCode) + string(companyIdentification) + string(serialNumber), "ISO17365_" + di + "_" + iac + "_" + cin + "_" + sn, nil
+	}
 
 	bs := append(dataIdentifier, issuingAgencyCode...)
 	bs = append(bs, companyIdentification...)
@@ -93,12 +132,12 @@ func MakeISO17365(di string, iac string, cin string, sn string) ([]byte, int, er
 
 	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
 	if err != nil {
-		return []byte{}, 0, err
+		return []byte{}, 0, "", "", err
 	}
 
 	var iso17365 = []interface{}{p}
 
-	return binutil.Pack(iso17365), length, nil
+	return binutil.Pack(iso17365), length, "", "", nil
 }
 
 // Pad6BitEncodingRuneSlice returns a new length
