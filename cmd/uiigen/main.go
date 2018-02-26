@@ -158,7 +158,14 @@ func main() {
 	if len(bs) != 0 {
 		if *modeHex && !*prefixFilter {
 			hs, _ := binutil.ParseBinStringToHexString(bs)
-			fmt.Println(opt + "," + hs)
+			length := ""
+			switch len(hs) {
+			case 20:
+				length = "16,80"
+			case 24:
+				length = "18,96"
+			}
+			fmt.Println(opt + "," + length + "," + hs)
 		} else {
 			fmt.Println(opt + "," + bs)
 		}
