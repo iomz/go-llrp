@@ -157,6 +157,21 @@ func ParseBinRuneSliceToInt(bs []rune) int {
 	return int(i)
 }
 
+// ParseBinStringToHexString returns Hex string
+func ParseBinStringToHexString(s string) (string, error) {
+	re := regexp.MustCompile("[^01]")
+	if re.FindStringIndex(s) != nil || len(s)%8 != 0 {
+		return "", errors.New("Input to ParseBinStringToHexString is not a bin string")
+	}
+
+	var hs string
+	for i := 0; i < len(s); i += 4 {
+		n := (int(s[i])-48)*8 + (int(s[i+1])-48)*4 + (int(s[i+2])-48)*2 + (int(s[i+3])-48)*1
+		hs = fmt.Sprintf("%s%x", hs, n)
+	}
+	return hs, nil
+}
+
 // ParseByteSliceToBinString returns run slice of bytes
 func ParseByteSliceToBinString(bys []byte) string {
 	bs := ""

@@ -16,6 +16,7 @@ var (
 	// kingpin app
 	app          = kingpin.New("uiigen", "A tool to generate an arbitrary UII (aka EPC).")
 	prefixFilter = app.Flag("pf", "Print a prefix filter for the given parameter").Default("false").Bool()
+	modeHex      = app.Flag("hex", "Print the ID in Hex.").Default("false").Bool()
 
 	// kingpin generate EPC mode
 	epc = app.Command("epc", "Generate an EPC.")
@@ -155,6 +156,11 @@ func main() {
 		bs, opt = MakeISO(*prefixFilter, "17365", *isoOwnerCode, *isoEquipmentCategoryIdentifier, *isoContainerSerialNumber, *isoDataIdeintifier, *isoIssuingAgencyCode, *isoCompanyIdentification, *isoSerialNumber)
 	}
 	if len(bs) != 0 {
-		fmt.Println(opt + "," + bs)
+		if *modeHex && !*prefixFilter {
+			hs, _ := binutil.ParseBinStringToHexString(bs)
+			fmt.Println(opt + "," + hs)
+		} else {
+			fmt.Println(opt + "," + bs)
+		}
 	}
 }
