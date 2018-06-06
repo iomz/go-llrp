@@ -98,20 +98,14 @@ func ReaderEventNotificationData(currentTime uint64) []byte {
 }
 
 // TagReportData generates TagReportData parameter from epcData, peakRSSI, airProtocolTagData, opSpecResult.
-func TagReportData(epcData []byte,
-	peakRSSI []byte,
-	airProtocolTagData []byte,
-	opSpecResult []byte) []byte {
-	tagReportDataLength := len(epcData) +
-		len(peakRSSI) + len(airProtocolTagData) +
-		len(opSpecResult) + 4 // Rsvd+Type+length->32bits=4bytes
+func TagReportData(epcData []byte, airProtocolTagData []byte) []byte {
+	tagReportDataLength := len(epcData) + len(airProtocolTagData) +
+		4 // Rsvd+Type+length->32bits=4bytes
 	var data = []interface{}{
 		uint16(240),                 // Rsvd+Type=240 (TagReportData parameter)
 		uint16(tagReportDataLength), // Length
 		epcData,
-		peakRSSI,
 		airProtocolTagData,
-		opSpecResult,
 	}
 	return Pack(data)
 }

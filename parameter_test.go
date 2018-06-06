@@ -81,7 +81,7 @@ func TestReaderEventNotificationData(t *testing.T) {
 
 func TestTagReportData(t *testing.T) {
 	var b, out, dummy []byte
-	b = TagReportData(dummy, dummy, dummy, dummy)
+	b = TagReportData(dummy, dummy)
 	out = []byte{0, 240}
 	if !bytes.Equal(b[:len(out)], out) {
 		t.Errorf("%v, want %v", b, out)
