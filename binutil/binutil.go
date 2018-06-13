@@ -157,6 +157,28 @@ func ParseBinRuneSliceToInt(bs []rune) int {
 	return int(i)
 }
 
+// ParseBinStringToDecArrayString
+func ParseBinStringToDecArrayString(s string) (string, error) {
+	re := regexp.MustCompile("[^01]")
+	if re.FindStringIndex(s) != nil || len(s)%8 != 0 {
+		return "", errors.New("Input to ParseBinStringToHexString is not a bin string")
+	}
+
+	ds := ""
+	for i := 0; i < len(s); i += 8 {
+		v, err := strconv.ParseInt(s[i:i+8], 2, 16)
+		if err != nil {
+			return ds, nil
+		}
+		if i == 0 {
+			ds = fmt.Sprintf("%v", v)
+		} else {
+			ds = fmt.Sprintf("%s, %v", ds, v)
+		}
+	}
+	return ds, nil
+}
+
 // ParseBinStringToHexString returns Hex string
 func ParseBinStringToHexString(s string) (string, error) {
 	re := regexp.MustCompile("[^01]")
@@ -200,6 +222,28 @@ func ParseHexStringToBinString(s string) (string, error) {
 		bs = fmt.Sprintf("%s%.4b", bs, n)
 	}
 	return bs, nil
+}
+
+// ParseHexStringToDecArrayString converts hex string to byte array
+func ParseHexStringToDecArrayString(s string) (string, error) {
+	re := regexp.MustCompile("[^0-9a-fA-F]")
+	if re.FindStringIndex(s) != nil {
+		return "", errors.New("Input to ParseHexStringToBinString is not a hex string")
+	}
+
+	ds := ""
+	for i := 0; i < len(s); i += 2 {
+		v, err := strconv.ParseInt(s[i:i+2], 16, 16)
+		if err != nil {
+			return ds, nil
+		}
+		if i == 0 {
+			ds = fmt.Sprintf("%v", v)
+		} else {
+			ds = fmt.Sprintf("%s, %v", ds, v)
+		}
+	}
+	return ds, nil
 }
 
 // ParseRuneSliceTo6BinRuneSlice returns 6-bit encoded rune slice

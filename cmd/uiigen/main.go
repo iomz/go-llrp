@@ -17,6 +17,7 @@ var (
 	app          = kingpin.New("uiigen", "A tool to generate an arbitrary UII (aka EPC).")
 	prefixFilter = app.Flag("pf", "Print a prefix filter for the given parameter").Default("false").Bool()
 	modeHex      = app.Flag("hex", "Print the ID in Hex.").Default("false").Bool()
+	modeDec      = app.Flag("dec", "Print the ID in Dec.").Default("false").Bool()
 
 	// kingpin generate EPC mode
 	epc = app.Command("epc", "Generate an EPC.")
@@ -158,14 +159,11 @@ func main() {
 	if len(bs) != 0 {
 		if *modeHex && !*prefixFilter {
 			hs, _ := binutil.ParseBinStringToHexString(bs)
-			length := ""
-			switch len(hs) {
-			case 20:
-				length = "16,80"
-			case 24:
-				length = "18,96"
-			}
-			fmt.Println(opt + "," + length + "," + hs)
+			fmt.Println(opt + "," + hs)
+		} else if *modeDec {
+			ds, _ := binutil.ParseBinStringToDecArrayString(bs)
+			pc, _ := binutil.ParseHexStringToDecArrayString(opt)
+			fmt.Println("[]byte{" + pc + "},[]byte{" + ds + "}")
 		} else {
 			fmt.Println(opt + "," + bs)
 		}

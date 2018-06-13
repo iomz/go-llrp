@@ -320,3 +320,163 @@ func TestParseRuneTo6BinRuneSlice(t *testing.T) {
 		})
 	}
 }
+
+func TestParseBinStringToDecArrayString(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{"15, 1", args{"0000111100000001"}, "15, 1", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ParseBinStringToDecArrayString(tt.args.s)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ParseBinStringToDecArrayString() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("ParseBinStringToDecArrayString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestParseBinStringToHexString(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ParseBinStringToHexString(tt.args.s)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ParseBinStringToHexString() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("ParseBinStringToHexString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestParseByteSliceToBinString(t *testing.T) {
+	type args struct {
+		bys []byte
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ParseByteSliceToBinString(tt.args.bys); got != tt.want {
+				t.Errorf("ParseByteSliceToBinString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestParseRuneSliceTo6BinRuneSlice(t *testing.T) {
+	type args struct {
+		r []rune
+	}
+	tests := []struct {
+		name string
+		args args
+		want []rune
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ParseRuneSliceTo6BinRuneSlice(tt.args.r); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ParseRuneSliceTo6BinRuneSlice() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSave(t *testing.T) {
+	type args struct {
+		path   string
+		object interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := Save(tt.args.path, tt.args.object); (err != nil) != tt.wantErr {
+				t.Errorf("Save() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestLoad(t *testing.T) {
+	type args struct {
+		path   string
+		object interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := Load(tt.args.path, tt.args.object); (err != nil) != tt.wantErr {
+				t.Errorf("Load() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestParseHexStringToDecArrayString(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{"3000->48,0", args{"3000"}, "48, 0", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ParseHexStringToDecArrayString(tt.args.s)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ParseHexStringToDecArrayString() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("ParseHexStringToDecArrayString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
