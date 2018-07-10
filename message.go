@@ -20,19 +20,6 @@ func KeepaliveAck() []byte {
 	return Pack(data)
 }
 
-// ROAccessReport generates ROAccessReport message.
-func ROAccessReport(tagReportData []byte, messageID uint32) []byte {
-	roAccessReportLength :=
-		len(tagReportData) + 10 // Rsvd+Ver+Type+Length+ID->80bits=10bytes
-	var data = []interface{}{
-		uint16(ROAccessReportHeader), // Rsvd+Ver+Type=61 (RO_ACCESS_REPORT)
-		uint32(roAccessReportLength), // Message length
-		messageID,                    // Message ID
-		tagReportData,
-	}
-	return Pack(data)
-}
-
 // ReaderEventNotification generates ReaderEventNotification message.
 func ReaderEventNotification(messageID uint32, currentTime uint64) []byte {
 	readerEventNotificationData := ReaderEventNotificationData(currentTime)

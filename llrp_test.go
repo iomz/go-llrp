@@ -1,25 +1,18 @@
+// Copyright (c) 2018 Iori Mizutani
+//
+// Use of this source code is governed by The MIT License
+// that can be found in the LICENSE file.
+
 package llrp
 
 import (
 	"bytes"
-	"errors"
+	"math/rand"
+	"os"
 	"testing"
+
+	"github.com/iomz/go-llrp/binutil"
 )
-
-func TestCheck(t *testing.T) {
-	e := errors.New("dummy error")
-	check(nil)
-	assertCheckPanic(t, check, e)
-}
-
-func assertCheckPanic(t *testing.T, f func(error), e error) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("The code did not panic")
-		}
-	}()
-	f(e)
-}
 
 var packtests = []struct {
 	in  []interface{}
@@ -36,5 +29,103 @@ func TestPack(t *testing.T) {
 		if !bytes.Equal(b, tt.out) {
 			t.Errorf("%v => %v, want %v", tt.in, b, tt.out)
 		}
+	}
+}
+
+func TestUnmarshalROAccessReportBody(t *testing.T) {
+	largeTagsGOB := os.Getenv("GOPATH") + "/src/github.com/iomz/go-llrp/test/data/1000-tags.gob"
+	size := 100
+	// load up the tags from the file
+	var largeTags Tags
+	binutil.Load(largeTagsGOB, &largeTags)
+
+	// cap the tags with the given size
+	var limitedTags Tags
+	perms := rand.Perm(len(largeTags))
+	for n, i := range perms {
+		if n < size {
+			limitedTags = append(limitedTags, largeTags[i])
+		} else {
+			break
+		}
+		if n+1 == len(largeTags) {
+			t.Fatal("given tag size is larger than the testdata available")
+		}
+	}
+
+	// build ROAR message
+	pdu := int(1500)
+	trds := limitedTags.BuildTagReportDataStack(pdu)
+	if len(trds) == 0 {
+		t.Fatal("TagReportDataStack generation failed")
+	}
+
+	var res []*LLRPReadEvent
+	for i, trd := range trds {
+		roar := NewROAccessReport(trd.Data, uint32(i))
+		res = append(res, UnmarshalROAccessReportBody(roar.data[10:])...)
+	}
+
+	if len(res) != size {
+		t.Errorf("UnmarshalROAccessReport() = %v", res)
+	}
+}
+
+func BenchmarkUnmarshalROAccessReportBody(b *testing.B) {
+	largeTagsGOB := os.Getenv("GOPATH") + "/src/github.com/iomz/go-llrp/test/data/million-tags.gob"
+	// load up the tags from the file
+	var largeTags Tags
+	binutil.Load(largeTagsGOB, &largeTags)
+
+	cycle := b.N / len(largeTags)
+	remaining := b.N % len(largeTags)
+
+	// cap the tags with the given size
+	var limitedTags Tags
+	perms := rand.Perm(len(largeTags))
+	for n, i := range perms {
+		if n < remaining {
+			limitedTags = append(limitedTags, largeTags[i])
+		} else {
+			break
+		}
+		if n == len(largeTags) {
+			b.Skip("given tag size is larger than the testdata available")
+		}
+	}
+
+	// build ROAR message
+	pdu := int(1500)
+	trds := largeTags.BuildTagReportDataStack(pdu)
+	if len(trds) == 0 {
+		b.Fatal("TagReportDataStack generation was failed")
+	}
+	limitedTRDs := limitedTags.BuildTagReportDataStack(pdu)
+	if len(limitedTRDs) == 0 && remaining != 0 {
+		b.Logf("len(limitedTags): %v, len(limitedTRDs: %v", len(limitedTags), len(limitedTRDs))
+		b.Logf("b.N: %v, cycle: %v, remaining: %v", b.N, cycle, remaining)
+		b.Fatal("TagReportDataStack generation failed")
+	}
+
+	var res []*LLRPReadEvent
+	b.ResetTimer()
+	for c := 0; c < cycle; c++ {
+		for i, trd := range trds {
+			b.StopTimer()
+			roar := NewROAccessReport(trd.Data, uint32(i))
+			b.StartTimer()
+			res = append(res, UnmarshalROAccessReportBody(roar.data[10:])...)
+		}
+	}
+
+	for i, trd := range limitedTRDs {
+		b.StopTimer()
+		roar := NewROAccessReport(trd.Data, uint32(i))
+		b.StartTimer()
+		res = append(res, UnmarshalROAccessReportBody(roar.data[10:])...)
+	}
+	b.StopTimer()
+	if b.N != len(res) {
+		b.Fatal("LLRP unmarshaller failed")
 	}
 }

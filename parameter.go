@@ -97,6 +97,7 @@ func ReaderEventNotificationData(currentTime uint64) []byte {
 	return Pack(data)
 }
 
+/*
 // TagReportData generates TagReportData parameter from epcData, peakRSSI, airProtocolTagData, opSpecResult.
 func TagReportData(epcData []byte, airProtocolTagData []byte) []byte {
 	tagReportDataLength := len(epcData) + len(airProtocolTagData) +
@@ -109,6 +110,7 @@ func TagReportData(epcData []byte, airProtocolTagData []byte) []byte {
 	}
 	return Pack(data)
 }
+*/
 
 // UTCTimeStamp generates UTCTimeStamp parameter at the current time.
 func UTCTimeStamp(currentTime uint64) []byte {

@@ -79,6 +79,7 @@ func TestReaderEventNotificationData(t *testing.T) {
 	}
 }
 
+/*
 func TestTagReportData(t *testing.T) {
 	var b, out, dummy []byte
 	b = TagReportData(dummy, dummy)
@@ -89,6 +90,7 @@ func TestTagReportData(t *testing.T) {
 	// TODO: might need content length verifications
 	t.Skip()
 }
+*/
 
 func TestUTCTimeStamp(t *testing.T) {
 	var b, out []byte

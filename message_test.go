@@ -23,6 +23,7 @@ func TestKeepaliveAck(t *testing.T) {
 	}
 }
 
+/*
 func TestROAccessReport(t *testing.T) {
 	var b, out, dummy []byte
 	b = ROAccessReport(dummy, 1000)
@@ -33,6 +34,7 @@ func TestROAccessReport(t *testing.T) {
 	// TODO: might need content length verifications
 	t.Skip()
 }
+*/
 
 func TestReaderEventNotification(t *testing.T) {
 	var b, out []byte
