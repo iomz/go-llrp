@@ -71,7 +71,8 @@ func TestUnmarshalROAccessReportBody(t *testing.T) {
 	}
 }
 
-func BenchmarkUnmarshalROAccessReportBody(b *testing.B) {
+/*
+func BenchmarkUnmarshalLargeROAR(b *testing.B) {
 	largeTagsGOB := os.Getenv("GOPATH") + "/src/github.com/iomz/go-llrp/test/data/million-tags.gob"
 	// load up the tags from the file
 	var largeTags Tags
@@ -129,3 +130,56 @@ func BenchmarkUnmarshalROAccessReportBody(b *testing.B) {
 		b.Fatal("LLRP unmarshaller failed")
 	}
 }
+*/
+
+func benchmarkUnmarshalNROARNTags(nROAR int, nTags int, b *testing.B) {
+	largeTagsGOB := os.Getenv("GOPATH") + "/src/github.com/iomz/go-llrp/test/data/million-tags.gob"
+	// load up the tags from the file
+	var largeTags Tags
+	binutil.Load(largeTagsGOB, &largeTags)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		for n := 0; n < nROAR; n++ {
+			b.StopTimer()
+			// cap the tags with the given size
+			var limitedTags Tags
+			perms := rand.Perm(len(largeTags))
+			for count, i := range perms {
+				if count < nTags {
+					limitedTags = append(limitedTags, largeTags[i])
+				} else {
+					break
+				}
+				if count == len(largeTags) {
+					b.Skip("given tag size is larger than the testdata available")
+				}
+			}
+
+			// build ROAR message
+			pdu := nTags * 30 // atmost 30 bytes for each Tag
+			trds := limitedTags.BuildTagReportDataStack(pdu)
+			if len(trds) != 1 {
+				b.Fatal("TagReportDataStack generation was failed")
+			}
+			roar := NewROAccessReport(trds[0].Data, uint32(i))
+			b.StartTimer()
+			res := UnmarshalROAccessReportBody(roar.data[10:])
+			if len(res) != nTags {
+				b.Fatal("LLRP unmarshaller failed")
+			}
+		}
+	}
+	b.StopTimer()
+}
+
+func BenchmarkUnmarshal100ROAR100Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(100, 100, b) }
+func BenchmarkUnmarshal200ROAR100Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(200, 100, b) }
+func BenchmarkUnmarshal300ROAR100Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(300, 100, b) }
+func BenchmarkUnmarshal400ROAR100Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(400, 100, b) }
+func BenchmarkUnmarshal500ROAR100Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(500, 100, b) }
+func BenchmarkUnmarshal600ROAR100Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(600, 100, b) }
+func BenchmarkUnmarshal700ROAR100Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(700, 100, b) }
+func BenchmarkUnmarshal800ROAR100Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(800, 100, b) }
+func BenchmarkUnmarshal900ROAR100Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(900, 100, b) }
+func BenchmarkUnmarshal1000ROAR100Tags(b *testing.B) { benchmarkUnmarshalNROARNTags(1000, 100, b) }
