@@ -60,7 +60,7 @@ func TestUnmarshalROAccessReportBody(t *testing.T) {
 		t.Fatal("TagReportDataStack generation failed")
 	}
 
-	var res []*LLRPReadEvent
+	var res []*ReadEvent
 	for i, trd := range trds {
 		roar := NewROAccessReport(trd.Data, uint32(i))
 		res = append(res, UnmarshalROAccessReportBody(roar.data[10:])...)
@@ -108,7 +108,7 @@ func BenchmarkUnmarshalLargeROAR(b *testing.B) {
 		b.Fatal("TagReportDataStack generation failed")
 	}
 
-	var res []*LLRPReadEvent
+	var res []*ReadEvent
 	b.ResetTimer()
 	for c := 0; c < cycle; c++ {
 		for i, trd := range trds {

@@ -34,15 +34,15 @@ func Pack(data []interface{}) []byte {
 }
 
 // ReadEvent is the struct to hold data on RFTags
-type LLRPReadEvent struct {
+type ReadEvent struct {
 	ID []byte
 	PC []byte
 }
 
 // UnmarshalROAccessReportBody extract ReadEvent from the message value in the ROAccessReport
-func UnmarshalROAccessReportBody(roarBody []byte) []*LLRPReadEvent {
+func UnmarshalROAccessReportBody(roarBody []byte) []*ReadEvent {
 	//defer timeTrack(time.Now(), fmt.Sprintf("unpacking %v bytes", len(roarBody)))
-	res := []*LLRPReadEvent{}
+	res := []*ReadEvent{}
 
 	// iterate through the parameters in roarBody
 	for offset := 0; offset < len(roarBody); {
@@ -77,7 +77,7 @@ func UnmarshalROAccessReportBody(roarBody []byte) []*LLRPReadEvent {
 			}
 		}
 		// append the id and pc as an ReadEvent
-		res = append(res, &LLRPReadEvent{id, pc})
+		res = append(res, &ReadEvent{id, pc})
 	}
 	return res
 }
