@@ -16,10 +16,10 @@ import (
 )
 
 var (
-	//hexRunes to hold hex chars
-	hexRunes      = []rune("0123456789ABCDEF")
-	alphabetRunes = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	digitRunes    = []rune("0123456789")
+	alphabetRunes     = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	alphanumericRunes = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	digitRunes        = []rune("0123456789")
+	hexRunes          = []rune("0123456789ABCDEF")
 )
 
 // GenerateNLengthAlphabetString returns random alphabet rune for n length
@@ -28,6 +28,16 @@ func GenerateNLengthAlphabetString(n int) string {
 	rand.Seed(time.Now().UTC().UnixNano())
 	for i := range b {
 		b[i] = alphabetRunes[rand.Intn(len(alphabetRunes))]
+	}
+	return string(b)
+}
+
+// GenerateNLengthAlphanumericString returns random alphanumeric rune for n length
+func GenerateNLengthAlphanumericString(n int) string {
+	b := make([]rune, n)
+	rand.Seed(time.Now().UTC().UnixNano())
+	for i := range b {
+		b[i] = alphanumericRunes[rand.Intn(len(alphanumericRunes))]
 	}
 	return string(b)
 }
