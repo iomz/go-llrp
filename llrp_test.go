@@ -132,7 +132,7 @@ func BenchmarkUnmarshalLargeROAR(b *testing.B) {
 }
 */
 
-func benchmarkUnmarshalNROARNTags(nROAR int, nTags int, b *testing.B) {
+func benchmarkUnmarshalNROARNTags(nTags int, b *testing.B) {
 	largeTagsGOB := os.Getenv("GOPATH") + "/src/github.com/iomz/go-llrp/test/data/million-tags.gob"
 	// load up the tags from the file
 	var largeTags Tags
@@ -156,23 +156,27 @@ func benchmarkUnmarshalNROARNTags(nROAR int, nTags int, b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
+		count = 0
 		for _, trd := range trds {
 			b.StopTimer()
 			roar := NewROAccessReport(trd.Data, uint32(i))
 			b.StartTimer()
 			res := UnmarshalROAccessReportBody(roar.data[10:])
-			_ = res
+			count += len(res)
+		}
+		if count != nTags {
+			b.Fatal("something went wrong during unmarshaling the RO_ACCESS_REPORT")
 		}
 	}
 }
 
-func BenchmarkUnmarshal100Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(100, 100, b) }
-func BenchmarkUnmarshal200Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(200, 100, b) }
-func BenchmarkUnmarshal300Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(300, 100, b) }
-func BenchmarkUnmarshal400Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(400, 100, b) }
-func BenchmarkUnmarshal500Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(500, 100, b) }
-func BenchmarkUnmarshal600Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(600, 100, b) }
-func BenchmarkUnmarshal700Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(700, 100, b) }
-func BenchmarkUnmarshal800Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(800, 100, b) }
-func BenchmarkUnmarshal900Tags(b *testing.B)  { benchmarkUnmarshalNROARNTags(900, 100, b) }
-func BenchmarkUnmarshal1000Tags(b *testing.B) { benchmarkUnmarshalNROARNTags(1000, 100, b) }
+func BenchmarkUnmarshal100Tags(b *testing.B)  { benchmarkUnmarshalNTags(100, b) }
+func BenchmarkUnmarshal200Tags(b *testing.B)  { benchmarkUnmarshalNTags(200, b) }
+func BenchmarkUnmarshal300Tags(b *testing.B)  { benchmarkUnmarshalNTags(300, b) }
+func BenchmarkUnmarshal400Tags(b *testing.B)  { benchmarkUnmarshalNTags(400, b) }
+func BenchmarkUnmarshal500Tags(b *testing.B)  { benchmarkUnmarshalNTags(500, b) }
+func BenchmarkUnmarshal600Tags(b *testing.B)  { benchmarkUnmarshalNTags(600, b) }
+func BenchmarkUnmarshal700Tags(b *testing.B)  { benchmarkUnmarshalNTags(700, b) }
+func BenchmarkUnmarshal800Tags(b *testing.B)  { benchmarkUnmarshalNTags(800, b) }
+func BenchmarkUnmarshal900Tags(b *testing.B)  { benchmarkUnmarshalNTags(900, b) }
+func BenchmarkUnmarshal1000Tags(b *testing.B) { benchmarkUnmarshalNTags(1000, b) }
