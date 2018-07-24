@@ -156,9 +156,9 @@ func benchmarkUnmarshalNROARNTags(nROAR int, nTags int, b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		for n := 0; n < nROAR; n++ {
+		for _, trd := range trds {
 			b.StopTimer()
-			roar := NewROAccessReport(trds[n].Data, uint32(i))
+			roar := NewROAccessReport(trd.Data, uint32(i))
 			b.StartTimer()
 			res := UnmarshalROAccessReportBody(roar.data[10:])
 			_ = res
