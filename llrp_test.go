@@ -132,7 +132,7 @@ func BenchmarkUnmarshalLargeROAR(b *testing.B) {
 }
 */
 
-func benchmarkUnmarshalNROARNTags(nTags int, b *testing.B) {
+func benchmarkUnmarshalNTags(nTags int, b *testing.B) {
 	largeTagsGOB := os.Getenv("GOPATH") + "/src/github.com/iomz/go-llrp/test/data/million-tags.gob"
 	// load up the tags from the file
 	var largeTags Tags
@@ -156,7 +156,7 @@ func benchmarkUnmarshalNROARNTags(nTags int, b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		count = 0
+		count := 0
 		for _, trd := range trds {
 			b.StopTimer()
 			roar := NewROAccessReport(trd.Data, uint32(i))
