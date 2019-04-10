@@ -56,8 +56,8 @@ func TestSetReaderConfig(t *testing.T) {
 
 func TestSetReaderConfigResponse(t *testing.T) {
 	var b, out []byte
-	b = SetReaderConfigResponse()
-	out = []byte{4, 13, 0, 0, 0, 18, 0, 0, 0, 0, 1, 31, 0, 8, 0, 0, 0, 0}
+	b = SetReaderConfigResponse(1000)
+	out = []byte{4, 13, 0, 0, 0, 18, 0, 0, 3, 232, 1, 31, 0, 8, 0, 0, 0, 0}
 	if !bytes.Equal(b, out) {
 		t.Errorf("%v, want %v", b, out)
 	}

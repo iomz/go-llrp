@@ -28,7 +28,7 @@ func ReaderEventNotification(messageID uint32, currentTime uint64) []byte {
 	var data = []interface{}{
 		uint16(ReaderEventNotificationHeader), // Rsvd+Ver+Type=63 (READER_EVENT_NOTIFICATION)
 		uint32(readerEventNotificationLength), // Length
-		messageID, // ID
+		messageID,                             // ID
 		readerEventNotificationData,
 	}
 	return Pack(data)
@@ -50,14 +50,14 @@ func SetReaderConfig(messageID uint32) []byte {
 }
 
 // SetReaderConfigResponse generates SetReaderConfigResponse message.
-func SetReaderConfigResponse() []byte {
+func SetReaderConfigResponse(messageID uint32) []byte {
 	llrpStatus := Status()
 	setReaderConfigResponseLength :=
 		len(llrpStatus) + 10 // Rsvd+Ver+Type+Length+ID+R+Rsvd->80bits=10bytes
 	var data = []interface{}{
 		uint16(SetReaderConfigResponseHeader), // Rsvd+Ver+Type=13 (SET_READER_CONFIG_RESPONSE)
 		uint32(setReaderConfigResponseLength), // Length
-		uint32(0), // ID
+		messageID,                             // ID
 		llrpStatus,
 	}
 	return Pack(data)
