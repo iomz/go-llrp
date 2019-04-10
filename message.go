@@ -1,21 +1,21 @@
 package llrp
 
 // Keepalive generates Keepalive message.
-func Keepalive() []byte {
+func Keepalive(messageID uint32) []byte {
 	var data = []interface{}{
 		uint16(KeepaliveHeader), // Rsvd+Ver+Type=62 (KEEPALIVE)
 		uint32(10),              // Length
-		uint32(0),               // ID
+		messageID,               // ID
 	}
 	return Pack(data)
 }
 
 // KeepaliveAck generates KeepaliveAck message.
-func KeepaliveAck() []byte {
+func KeepaliveAck(messageID uint32) []byte {
 	var data = []interface{}{
 		uint16(KeepaliveAckHeader), // Rsvd+Ver+Type=62 (KEEPALIVE)
 		uint32(10),                 // Length
-		uint32(0),                  // ID
+		messageID,                  // ID
 	}
 	return Pack(data)
 }

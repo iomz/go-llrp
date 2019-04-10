@@ -7,7 +7,7 @@ import (
 
 func TestKeepalive(t *testing.T) {
 	var b, out []byte
-	b = Keepalive()
+	b = Keepalive(0)
 	out = []byte{4, 62, 0, 0, 0, 10, 0, 0, 0, 0}
 	if !bytes.Equal(b, out) {
 		t.Errorf("%v, want %v", b, out)
@@ -16,7 +16,7 @@ func TestKeepalive(t *testing.T) {
 
 func TestKeepaliveAck(t *testing.T) {
 	var b, out []byte
-	b = KeepaliveAck()
+	b = KeepaliveAck(0)
 	out = []byte{4, 72, 0, 0, 0, 10, 0, 0, 0, 0}
 	if !bytes.Equal(b, out) {
 		t.Errorf("%v, want %v", b, out)
