@@ -19,17 +19,21 @@ func NewTagReportDataParam(tag *Tag) []byte {
 	epcLengthBits := len(tag.EPC) * 8 // # bytes * 8 = # bits
 	length := 4 + 2 + len(tag.EPC)    // header + epcLengthBits + epc
 	epcd := EPCData(uint16(length), uint16(epcLengthBits), tag.EPC)
-
+	chIndex := ChannelIndex()
+	timestamp := LastSeenTimestampUTC()
+	tagSeenCount := TagSeenCount()
 	// AirProtocolTagData
-	aptd := C1G2PC(tag.PCBits)
+	//aptd := C1G2PC(tag.PCBits)
 
-	tagReportDataLength := len(epcd) + len(aptd) + 4 // Rsvd+Type+length->32bits=4bytes
+	tagReportDataLength := 4 + len(epcd) + len(chIndex) + len(timestamp) + len(tagSeenCount) // Rsvd+Type+length->32bits=4bytes
 
 	// Pack in []byte
 	return Pack([]interface{}{
 		uint16(240),                 // Rsvd+Type=240 (TagReportData parameter)
 		uint16(tagReportDataLength), // Length
 		epcd,
-		aptd,
+		chIndex,
+		timestamp,
+		tagSeenCount,
 	})
 }
