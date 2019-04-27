@@ -22,13 +22,13 @@ func NewTagReportDataParam(tag *Tag) []byte {
 	epcd := EPCData(uint16(length), uint16(epcLengthBits), tag.EPC)
 
 	// ChannlenIndex
-	chIndex := ChannelIndex()
+	//chIndex := ChannelIndex()
 
 	// LastSeenTimeStamp
-	timestamp := LastSeenTimestampUTC()
+	//timestamp := LastSeenTimestampUTC()
 
 	// TagSeenCount
-	tagSeenCount := TagSeenCount()
+	//tagSeenCount := TagSeenCount()
 
 	// AirProtocolTagData
 	aptd := C1G2PC(tag.PCBits)
