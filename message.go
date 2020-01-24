@@ -28,7 +28,7 @@ func ReaderEventNotification(messageID uint32, currentTime uint64) []byte {
 	var data = []interface{}{
 		uint16(ReaderEventNotificationHeader), // Rsvd+Ver+Type=63 (READER_EVENT_NOTIFICATION)
 		uint32(readerEventNotificationLength), // Length
-		messageID, // ID
+		messageID,                             // ID
 		readerEventNotificationData,
 	}
 	return Pack(data)
@@ -57,7 +57,7 @@ func SetReaderConfigResponse(messageID uint32) []byte {
 	var data = []interface{}{
 		uint16(SetReaderConfigResponseHeader), // Rsvd+Ver+Type=13 (SET_READER_CONFIG_RESPONSE)
 		uint32(setReaderConfigResponseLength), // Length
-		messageID, // ID
+		messageID,                             // ID
 		llrpStatus,
 	}
 	return Pack(data)
@@ -221,6 +221,20 @@ func AntennaAirPort(id uint16) []byte {
 		uint16(id),
 		uint16(1), //num of protocols
 		uint8(1),  //protocol id : EPCGlobal Class 1 Gen 2
+	}
+	return Pack(data)
+}
+
+func ImpinjEnableCutomMessage(id uint32) []byte {
+	llrpStatus := Status()
+	var data = []interface{}{
+		uint16(ImpinjEnableCutomMessageHeader), //type
+		uint32(19),                             //length
+		uint32(id),                             //id
+		uint32(25822),                          //vendor id
+		uint8(22),                              //subtype
+		llrpStatus,
+		uint32(0), //reserved
 	}
 	return Pack(data)
 }
