@@ -229,7 +229,7 @@ func ImpinjEnableCutomMessage(id uint32) []byte {
 	llrpStatus := Status()
 	var data = []interface{}{
 		uint16(ImpinjEnableCutomMessageHeader), //type
-		uint32(19),                             //length
+		uint32(23),                             //length
 		uint32(id),                             //id
 		uint32(25822),                          //vendor id
 		uint8(22),                              //subtype
