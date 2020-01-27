@@ -234,7 +234,6 @@ func ImpinjEnableCutomMessage(id uint32) []byte {
 		uint32(25822),                          //vendor id
 		uint8(22),                              //subtype
 		llrpStatus,
-		uint32(0), //reserved
 	}
 	return Pack(data)
 }
