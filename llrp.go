@@ -18,7 +18,6 @@ const (
 	SetReaderConfigHeader             = 1027 // type 3
 	SetReaderConfigResponseHeader     = 1037 // type 13
 	KeepaliveHeader                   = 1086 // type 62
-	EnableEventsAndReport			  = 1088 // type 64
 	KeepaliveAckHeader                = 1096 // type 72
 	GetReaderCapabilityHeader         = 1025 // type 1
 	GetReaderCapabilityResponseHeader = 1035 // type 11
