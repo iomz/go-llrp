@@ -47,7 +47,7 @@ func EPCData(length uint16, epcLengthBits uint16, epc []byte) []byte {
 			uint16(241),           // uint8(0)+uint8(Type=241)
 			uint16(length),        // Length
 			uint16(epcLengthBits), // EPCLengthBits
-			epc, // EPCData string
+			epc,                   // EPCData string
 		}
 	}
 	return Pack(data)
@@ -72,7 +72,7 @@ func LastSeenTimestampUTC() []byte {
 }
 
 func makeTimestamp() int64 {
-	return time.Now().UnixNano() / (int64(time.Millisecond) / int64(time.Nanosecond))
+	return time.Now().UnixNano() / (int64(time.Microsecond) / int64(time.Nanosecond))
 }
 
 //TagSeenCount :
@@ -122,7 +122,7 @@ func ReaderEventNotificationData(currentTime uint64) []byte {
 	readerEventNotificationDataLength := len(utcTimeStamp) +
 		len(connectionAttemptEvent) + 4 // Rsvd+Type+length=32bits=4bytes
 	var data = []interface{}{
-		uint16(246),                               // Rsvd+Type=246 (ReaderEventNotificationData parameter)
+		uint16(246), // Rsvd+Type=246 (ReaderEventNotificationData parameter)
 		uint16(readerEventNotificationDataLength), // Length
 		utcTimeStamp,
 		connectionAttemptEvent,
