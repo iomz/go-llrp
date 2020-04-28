@@ -11,9 +11,7 @@ See [golemu](https://github.com/iomz/golemu) for an example use of this package.
 
 ## Installation
 
-Install [dep](https://github.com/golang/dep) first and do the following:
-
-    go get github.com/iomz/go-llrp && cd $GOPATH/src/github.com/iomz/go-llrp && dep ensure
+    go get -v github.com/iomz/go-llrp
 
 ## Benchmark
 
