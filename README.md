@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/iomz/go-llrp)](https://goreportcard.com/report/github.com/iomz/go-llrp)
 [![codecov](https://codecov.io/gh/iomz/go-llrp/branch/main/graph/badge.svg?token=fN1tyc6ssX)](https://codecov.io/gh/iomz/go-llrp)
 [![GoDoc](https://godoc.org/github.com/iomz/go-llrp?status.svg)](http://godoc.org/github.com/iomz/go-llrp)
-[![License](https://img.shields.io/github/license/iomz/go-llrp.svg)](https://github.com/iomz/go-llrp/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/iomz/go-llrp.svg)](https://github.com/iomz/go-llrp/blob/main/LICENSE)
 
 The go-llrp package is a tiny library for simple LLRP message and paramter composition.
 See [golemu](https://github.com/iomz/golemu) for an example use of this package.
