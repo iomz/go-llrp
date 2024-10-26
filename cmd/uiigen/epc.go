@@ -203,7 +203,7 @@ func MakeGIAI96(pf bool, fv string, cp string, iar string) ([]byte, string, stri
 	bs = append(bs, indivisualAssetReference...)
 
 	if len(bs) != 88 {
-		return []byte{}, "", "", errors.New("len(bs): " + string(len(bs)))
+		return []byte{}, "", "", fmt.Errorf("len(bs): %d", len(bs))
 	}
 
 	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
@@ -270,7 +270,7 @@ func MakeGRAI96(pf bool, fv string, cp string, at string, ser string) ([]byte, s
 	bs = append(bs, serial...)
 
 	if len(bs) != 88 {
-		return []byte{}, "", "", errors.New("len(bs): " + string(len(bs)))
+		return []byte{}, "", "", fmt.Errorf("len(bs): %d", len(bs))
 	}
 
 	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
@@ -336,7 +336,7 @@ func MakeSGTIN96(pf bool, fv string, cp string, ir string, ser string) ([]byte, 
 	bs = append(bs, serial...)
 
 	if len(bs) != 88 {
-		return []byte{}, "", "", errors.New("len(bs): " + string(len(bs)))
+		return []byte{}, "", "", fmt.Errorf("len(bs): %d", len(bs))
 	}
 
 	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
@@ -397,7 +397,7 @@ func MakeSSCC96(pf bool, fv string, cp string, ext string) ([]byte, string, stri
 	bs = append(bs, reserved...)
 
 	if len(bs) != 88 {
-		return []byte{}, "", "", errors.New("len(bs): " + string(len(bs)))
+		return []byte{}, "", "", fmt.Errorf("len(bs): %d", len(bs))
 	}
 
 	p, err := binutil.ParseBinRuneSliceToUint8Slice(bs)
