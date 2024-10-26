@@ -6,6 +6,7 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
+	"io/fs"
 	"math"
 	"math/big"
 	"math/rand"
@@ -293,5 +294,12 @@ func Load(path string, object interface{}) error {
 		err = decoder.Decode(object)
 	}
 	file.Close()
+	return err
+}
+
+// LoadEmbed loads gob from embed.FS
+func LoadEmbed(f fs.File, object interface{}) error {
+	decoder := gob.NewDecoder(f)
+	err := decoder.Decode(object)
 	return err
 }

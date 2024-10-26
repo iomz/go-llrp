@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Iori Mizutani
+// Copyright (c) 2024 Iori Mizutani
 //
 // Use of this source code is governed by The MIT License
 // that can be found in the LICENSE file.
@@ -7,11 +7,18 @@ package llrp
 
 import (
 	"bytes"
+	"embed"
+	_ "embed"
 	"math/rand"
 	"os"
 	"testing"
 
 	"github.com/iomz/go-llrp/binutil"
+)
+
+var (
+	//go:embed test/data/1000-tags.gob
+	TestTags1000 embed.FS
 )
 
 var packtests = []struct {
@@ -33,11 +40,15 @@ func TestPack(t *testing.T) {
 }
 
 func TestUnmarshalROAccessReportBody(t *testing.T) {
-	largeTagsGOB := os.Getenv("GOPATH") + "/src/github.com/iomz/go-llrp/test/data/1000-tags.gob"
 	size := 100
 	// load up the tags from the file
 	var largeTags Tags
-	binutil.Load(largeTagsGOB, &largeTags)
+	f, err := TestTags1000.Open("test/data/1000-tags.gob")
+	if err != nil {
+		t.Error(err)
+	}
+	defer f.Close()
+	binutil.LoadEmbed(f, &largeTags)
 
 	// cap the tags with the given size
 	var limitedTags Tags
@@ -53,6 +64,7 @@ func TestUnmarshalROAccessReportBody(t *testing.T) {
 		}
 	}
 
+	t.Logf("limitedTags: %d", len(limitedTags))
 	// build ROAR message
 	pdu := int(1500)
 	trds := limitedTags.BuildTagReportDataStack(pdu)
