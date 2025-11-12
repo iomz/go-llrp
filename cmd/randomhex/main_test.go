@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -28,23 +30,45 @@ func Test_parseArg(t *testing.T) {
 	}
 }
 
+func Test_parseArgPanicsOnInsufficientArgs(t *testing.T) {
+	assertPanicsWith(t, "insufficient arg", func() {
+		parseArg([]string{"randomhex"})
+	})
+}
+
+func Test_parseArgPanicsOnInvalidNumber(t *testing.T) {
+	assertPanicsWith(t, "invalid syntax", func() {
+		parseArg([]string{"randomhex", "oops"})
+	})
+}
+
 func Test_printHexString(t *testing.T) {
 	type args struct {
 		i int
 	}
 	tests := []struct {
-		name  string
-		args  args
-		wantW string
+		name   string
+		args   args
+		length int
 	}{
-		{"3", args{3}, "123\n"},
+		{"3", args{3}, 3},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			w := &bytes.Buffer{}
 			printHexString(w, tt.args.i)
-			if gotW := w.String(); len(gotW) != len(tt.wantW) {
-				t.Errorf("printHexString() = %v, want %v", gotW, tt.wantW)
+			gotW := w.String()
+			if !strings.HasSuffix(gotW, "\n") {
+				t.Fatalf("expected trailing newline, got %q", gotW)
+			}
+			body := strings.TrimSuffix(gotW, "\n")
+			if len(body) != tt.length {
+				t.Fatalf("expected body length %d, got %d", tt.length, len(body))
+			}
+			for _, r := range body {
+				if !((r >= '0' && r <= '9') || (r >= 'A' && r <= 'F')) {
+					t.Fatalf("unexpected rune %q in %q", r, body)
+				}
 			}
 		})
 	}
@@ -52,4 +76,29 @@ func Test_printHexString(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	os.Exit(m.Run())
+}
+
+func assertPanicsWith(t *testing.T, substr string, fn func()) {
+	t.Helper()
+	defer func() {
+		if r := recover(); r == nil {
+			t.Fatalf("expected panic but none occurred")
+		} else if substr != "" {
+			switch v := r.(type) {
+			case error:
+				if !strings.Contains(v.Error(), substr) {
+					t.Fatalf("panic error %q does not contain %q", v.Error(), substr)
+				}
+			case string:
+				if !strings.Contains(v, substr) {
+					t.Fatalf("panic string %q does not contain %q", v, substr)
+				}
+			default:
+				if !strings.Contains(fmt.Sprint(v), substr) {
+					t.Fatalf("panic value %v does not contain %q", v, substr)
+				}
+			}
+		}
+	}()
+	fn()
 }
