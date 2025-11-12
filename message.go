@@ -1,6 +1,6 @@
 package llrp
 
-// Keepalive generates Keepalive message.
+// Keepalive returns the encoded KEEPALIVE message with the provided message ID.
 func Keepalive(messageID uint32) []byte {
 	var data = []interface{}{
 		uint16(KeepaliveHeader), // Rsvd+Ver+Type=62 (KEEPALIVE)
@@ -10,7 +10,7 @@ func Keepalive(messageID uint32) []byte {
 	return Pack(data)
 }
 
-// KeepaliveAck generates KeepaliveAck message.
+// KeepaliveAck returns the encoded KEEPALIVE_ACK message with the provided message ID.
 func KeepaliveAck(messageID uint32) []byte {
 	var data = []interface{}{
 		uint16(KeepaliveAckHeader), // Rsvd+Ver+Type=62 (KEEPALIVE)
@@ -20,7 +20,7 @@ func KeepaliveAck(messageID uint32) []byte {
 	return Pack(data)
 }
 
-// ReaderEventNotification generates ReaderEventNotification message.
+// ReaderEventNotification builds a READER_EVENT_NOTIFICATION message for the given timestamp.
 func ReaderEventNotification(messageID uint32, currentTime uint64) []byte {
 	readerEventNotificationData := ReaderEventNotificationData(currentTime)
 	readerEventNotificationLength :=
@@ -34,7 +34,7 @@ func ReaderEventNotification(messageID uint32, currentTime uint64) []byte {
 	return Pack(data)
 }
 
-// SetReaderConfig generates SetReaderConfig message.
+// SetReaderConfig builds a SET_READER_CONFIG message that enables periodic keepalives.
 func SetReaderConfig(messageID uint32) []byte {
 	keepaliveSpec := KeepaliveSpec()
 	setReaderConfigLength :=
@@ -49,7 +49,7 @@ func SetReaderConfig(messageID uint32) []byte {
 	return Pack(data)
 }
 
-// SetReaderConfigResponse generates SetReaderConfigResponse message.
+// SetReaderConfigResponse returns a SET_READER_CONFIG_RESPONSE message with a success status.
 func SetReaderConfigResponse(messageID uint32) []byte {
 	llrpStatus := Status()
 	setReaderConfigResponseLength :=
@@ -63,7 +63,7 @@ func SetReaderConfigResponse(messageID uint32) []byte {
 	return Pack(data)
 }
 
-//GetReaderCapability :
+// GetReaderCapability requests all reader capabilities from the device.
 func GetReaderCapability(messageID uint32) []byte {
 	getReaderCapabilityLength := 1 + 10
 	var data = []interface{}{
@@ -75,7 +75,7 @@ func GetReaderCapability(messageID uint32) []byte {
 	return Pack(data)
 }
 
-//GetReaderCapabilityResponse :
+// GetReaderCapabilityResponse returns a GET_READER_CAPABILITIES_RESPONSE populated with static data.
 func GetReaderCapabilityResponse(messageID uint32) []byte {
 
 	llrpStatus := Status()
@@ -100,7 +100,7 @@ func GetReaderCapabilityResponse(messageID uint32) []byte {
 	return Pack(data)
 }
 
-//GetReaderConfigResponse :
+// GetReaderConfigResponse returns a GET_READER_CONFIG_RESPONSE containing basic reader identity information.
 func GetReaderConfigResponse(messageID uint32) []byte {
 	llrpStatus := Status()
 	//numOfAntennas := 52
@@ -123,7 +123,7 @@ func GetReaderConfigResponse(messageID uint32) []byte {
 	return Pack(data)
 }
 
-//DeleteAccessSpecResponse : Delete Access Spec Response
+// DeleteAccessSpecResponse returns a DELETE_ACCESS_SPEC_RESPONSE with a success status.
 func DeleteAccessSpecResponse(messageID uint32) []byte {
 	llrpStatus := Status()
 	var data = []interface{}{
@@ -135,7 +135,7 @@ func DeleteAccessSpecResponse(messageID uint32) []byte {
 	return Pack(data)
 }
 
-//DeleteRospecResponse : Delete RoSpec Response
+// DeleteRospecResponse returns a DELETE_ROSPEC_RESPONSE with a success status.
 func DeleteRospecResponse(messageID uint32) []byte {
 	llrpStatus := Status()
 	var data = []interface{}{
@@ -147,7 +147,7 @@ func DeleteRospecResponse(messageID uint32) []byte {
 	return Pack(data)
 }
 
-//AddRospecResponse : Add ROSpec Response
+// AddRospecResponse returns an ADD_ROSPEC_RESPONSE with a success status.
 func AddRospecResponse(messageID uint32) []byte {
 	llrpStatus := Status()
 	var data = []interface{}{
@@ -159,7 +159,7 @@ func AddRospecResponse(messageID uint32) []byte {
 	return Pack(data)
 }
 
-//EnableRospecResponse : Enabled Rospec Response
+// EnableRospecResponse returns an ENABLE_ROSPEC_RESPONSE with a success status.
 func EnableRospecResponse(messageID uint32) []byte {
 	llrpStatus := Status()
 	var data = []interface{}{
@@ -171,7 +171,7 @@ func EnableRospecResponse(messageID uint32) []byte {
 	return Pack(data)
 }
 
-//ReceiveSensitivityEntries : Generates ReceiveSensitivityEntries used in General capabilities
+// ReceiveSensitivityEntries builds the receive sensitivity list used in general capabilities.
 func ReceiveSensitivityEntries(numOfAntennas int) []interface{} {
 	var data = []interface{}{}
 	for i := 1; i <= numOfAntennas; i++ {
@@ -181,7 +181,7 @@ func ReceiveSensitivityEntries(numOfAntennas int) []interface{} {
 	return data
 }
 
-//ReceiveSensitivityEntry :
+// ReceiveSensitivityEntry returns a single receive sensitivity entry for the given antenna ID.
 func ReceiveSensitivityEntry(id uint16) []byte {
 	var data = []interface{}{
 		uint16(139), //type
@@ -192,7 +192,7 @@ func ReceiveSensitivityEntry(id uint16) []byte {
 	return Pack(data)
 }
 
-//GPIOCapabilities : Generates GPIO capabilities proeprty
+// GPIOCapabilities returns the GPIO capabilities parameter declaring zero ports.
 func GPIOCapabilities() []byte {
 	var data = []interface{}{
 		uint16(141), //type
@@ -203,7 +203,7 @@ func GPIOCapabilities() []byte {
 	return Pack(data)
 }
 
-//AntennaAirPortList :
+// AntennaAirPortList returns the antenna air protocol list for the supplied antenna count.
 func AntennaAirPortList(numOfAntennas int) []interface{} {
 	var data = []interface{}{}
 	for i := 1; i <= numOfAntennas; i++ {
@@ -213,7 +213,7 @@ func AntennaAirPortList(numOfAntennas int) []interface{} {
 	return data
 }
 
-//AntennaAirPort :
+// AntennaAirPort returns a single antenna air protocol entry for the given antenna ID.
 func AntennaAirPort(id uint16) []byte {
 	var data = []interface{}{
 		uint16(140), //type
@@ -225,6 +225,7 @@ func AntennaAirPort(id uint16) []byte {
 	return Pack(data)
 }
 
+// ImpinjEnableCutomMessage returns the vendor-specific IMPINJ enable message.
 func ImpinjEnableCutomMessage(id uint32) []byte {
 	llrpStatus := Status()
 	var data = []interface{}{

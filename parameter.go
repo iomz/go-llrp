@@ -2,7 +2,7 @@ package llrp
 
 import "time"
 
-// C1G2PC generates C1G2PC parameter from hexpc string.
+// C1G2PC returns a C1G2_PC parameter constructed from the provided PC bits.
 func C1G2PC(pc uint16) []byte {
 	var data = []interface{}{
 		uint8(140), // 1+uint7(Type=12)
@@ -11,7 +11,7 @@ func C1G2PC(pc uint16) []byte {
 	return Pack(data)
 }
 
-// C1G2ReadOpSpecResult generates C1G2ReadOpSpecResult parameter from readData.
+// C1G2ReadOpSpecResult returns a C1G2_READ_OP_SPEC_RESULT parameter for the given read data.
 func C1G2ReadOpSpecResult(readData []byte) []byte {
 	var data = []interface{}{
 		uint16(349), // Rsvd+Type=
@@ -24,7 +24,7 @@ func C1G2ReadOpSpecResult(readData []byte) []byte {
 	return Pack(data)
 }
 
-// ConnectionAttemptEvent generates ConnectionAttemptEvent parameter.
+// ConnectionAttemptEvent returns a CONNECTION_ATTEMPT_EVENT parameter indicating success.
 func ConnectionAttemptEvent() []byte {
 	var data = []interface{}{
 		uint16(256), // Rsvd+Type=256
@@ -34,7 +34,7 @@ func ConnectionAttemptEvent() []byte {
 	return Pack(data)
 }
 
-// EPCData generates EPCData parameter from its length and epcLength, and epc.
+// EPCData returns an EPC_DATA parameter for the supplied EPC value and length.
 func EPCData(length uint16, epcLengthBits uint16, epc []byte) []byte {
 	var data []interface{}
 	if epcLengthBits == 96 {
@@ -53,7 +53,7 @@ func EPCData(length uint16, epcLengthBits uint16, epc []byte) []byte {
 	return Pack(data)
 }
 
-//ChannelIndex : Generates channelIndex for EPC tag
+// ChannelIndex returns the CHANNEL_INDEX parameter for an EPC tag.
 func ChannelIndex() []byte {
 	var data = []interface{}{
 		uint8(0x87), //type
@@ -62,7 +62,7 @@ func ChannelIndex() []byte {
 	return Pack(data)
 }
 
-//LastSeenTimestampUTC : Returns the a UNIX timestamp in microseconds
+// LastSeenTimestampUTC returns a LAST_SEEN_TIMESTAMP_UTC parameter in microseconds.
 func LastSeenTimestampUTC() []byte {
 	var data = []interface{}{
 		uint8(0x84),             //type
@@ -75,7 +75,7 @@ func makeTimestamp() int64 {
 	return time.Now().UnixNano() / (int64(time.Microsecond) / int64(time.Nanosecond))
 }
 
-//TagSeenCount :
+// TagSeenCount returns a TAG_SEEN_COUNT parameter with the default count value.
 func TagSeenCount() []byte {
 	var data = []interface{}{
 		uint8(0x88), //type
@@ -84,7 +84,7 @@ func TagSeenCount() []byte {
 	return Pack(data)
 }
 
-// KeepaliveSpec generates KeepaliveSpec parameter.
+// KeepaliveSpec returns a KEEPALIVE_SPEC parameter for periodic keepalives.
 func KeepaliveSpec() []byte {
 	var data = []interface{}{
 		uint16(220),   // Rsvd+Type=220
@@ -95,7 +95,7 @@ func KeepaliveSpec() []byte {
 	return Pack(data)
 }
 
-// Status generates LLRPStatus parameter.
+// Status returns an LLRP_STATUS parameter indicating success.
 func Status() []byte {
 	var data = []interface{}{
 		uint16(287), // Rsvd+Type=287
@@ -106,7 +106,7 @@ func Status() []byte {
 	return Pack(data)
 }
 
-// PeakRSSI generates PeakRSSI parameter.
+// PeakRSSI returns a PEAK_RSSI parameter with a fixed RSSI value.
 func PeakRSSI() []byte {
 	var data = []interface{}{
 		uint8(134), // 1+uint7(Type=6)
@@ -115,7 +115,7 @@ func PeakRSSI() []byte {
 	return Pack(data)
 }
 
-// ReaderEventNotificationData generates ReaderEventNotification parameter.
+// ReaderEventNotificationData returns a READER_EVENT_NOTIFICATION_DATA parameter for the provided timestamp.
 func ReaderEventNotificationData(currentTime uint64) []byte {
 	utcTimeStamp := UTCTimeStamp(currentTime)
 	connectionAttemptEvent := ConnectionAttemptEvent()
@@ -145,7 +145,7 @@ func TagReportData(epcData []byte, airProtocolTagData []byte) []byte {
 }
 */
 
-// UTCTimeStamp generates UTCTimeStamp parameter at the current time.
+// UTCTimeStamp returns a UTC_TIMESTAMP parameter for the provided time in microseconds.
 func UTCTimeStamp(currentTime uint64) []byte {
 	var data = []interface{}{
 		uint16(128), // Rsvd+Type=128
@@ -155,7 +155,7 @@ func UTCTimeStamp(currentTime uint64) []byte {
 	return Pack(data)
 }
 
-//GeneralDeviceCapabilities : Generates General Device Capabilities
+// GeneralDeviceCapabilities returns static GENERAL_DEVICE_CAPABILITIES information.
 func GeneralDeviceCapabilities() []byte {
 	numOfAntennas := 52
 	//totalReceiveSensitivities := 42
@@ -184,8 +184,8 @@ func GeneralDeviceCapabilities() []byte {
 	return x
 }
 
-//LlrpCapabilities : generates LLRP_CAPABILITIES
-func LlrpCapabilities() []byte {
+// LLRPCapabilities returns static LLRP_CAPABILITIES information.
+func LLRPCapabilities() []byte {
 	var data = []interface{}{
 		uint16(142),  //type 142
 		uint16(28),   //length
@@ -201,8 +201,14 @@ func LlrpCapabilities() []byte {
 	return Pack(data)
 }
 
-//ReguCapabilities : generates Regulatory Capabilities
-func ReguCapabilities() []byte {
+// LlrpCapabilities is kept for backward compatibility with the previous name.
+// Deprecated: use LLRPCapabilities instead.
+func LlrpCapabilities() []byte {
+	return LLRPCapabilities()
+}
+
+// RegulatoryCapabilities returns static REGULATORY_CAPABILITIES information.
+func RegulatoryCapabilities() []byte {
 	var data = []interface{}{
 		uint16(143),      //type 143
 		uint16(1189 + 8), //length
@@ -213,8 +219,14 @@ func ReguCapabilities() []byte {
 	return Pack(data)
 }
 
-//C1G2llrpCapabilities : Generates C1G2llrpCapabilities
-func C1G2llrpCapabilities() []byte {
+// ReguCapabilities is kept for backward compatibility with the previous name.
+// Deprecated: use RegulatoryCapabilities instead.
+func ReguCapabilities() []byte {
+	return RegulatoryCapabilities()
+}
+
+// C1G2LLRPCapabilities returns static C1G2_LLRP_CAPABILITIES information.
+func C1G2LLRPCapabilities() []byte {
 	var data = []interface{}{
 		uint16(327), //type 327
 		uint16(7),   //length
@@ -224,7 +236,13 @@ func C1G2llrpCapabilities() []byte {
 	return Pack(data)
 }
 
-//GetReaderConfigResponseIdentification : Generate Identification
+// C1G2llrpCapabilities is kept for backward compatibility with the previous name.
+// Deprecated: use C1G2LLRPCapabilities instead.
+func C1G2llrpCapabilities() []byte {
+	return C1G2LLRPCapabilities()
+}
+
+// GetReaderConfigResponseIdentification returns the IDENTIFICATION parameter for reader config responses.
 func GetReaderConfigResponseIdentification() []byte {
 	var data = []interface{}{
 		uint16(218),        //type
@@ -238,7 +256,7 @@ func GetReaderConfigResponseIdentification() []byte {
 	return Pack(data)
 }
 
-//AntennaProperties :
+// AntennaProperties returns an ANTENNA_PROPERTIES parameter for the provided antenna ID.
 func AntennaProperties(id uint16) []byte {
 	var data = []interface{}{
 		uint16(221), //type
@@ -250,6 +268,7 @@ func AntennaProperties(id uint16) []byte {
 	return Pack(data)
 }
 
+// AntennaConfiguration returns the ANTENNA_CONFIGURATION parameter hierarchy for the given antenna ID.
 func AntennaConfiguration(id uint16) []byte {
 	length := 6 + 6 + 10 + 24 //36
 	var data = []interface{}{
@@ -264,6 +283,7 @@ func AntennaConfiguration(id uint16) []byte {
 	return x
 }
 
+// RFReceiver returns an RF_RECEIVER parameter with the default receiver sensitivity.
 func RFReceiver() []byte {
 	length := 6
 	var data = []interface{}{
@@ -274,6 +294,7 @@ func RFReceiver() []byte {
 	return Pack(data)
 }
 
+// RFTransmitter returns an RF_TRANSMITTER parameter with default transmit power settings.
 func RFTransmitter() []byte {
 	length := 10
 	var data = []interface{}{
@@ -286,6 +307,7 @@ func RFTransmitter() []byte {
 	return Pack(data)
 }
 
+// C1G2InventoryCommand returns a C1G2_INVENTORY_COMMAND parameter with default configuration.
 func C1G2InventoryCommand() []byte {
 	length := 5 + 8 + 11
 	var data = []interface{}{
@@ -300,6 +322,7 @@ func C1G2InventoryCommand() []byte {
 	return x
 }
 
+// C1G2RFControl returns a C1G2_RF_CONTROL parameter with static mode settings.
 func C1G2RFControl() []byte {
 	length := 8
 	var data = []interface{}{
@@ -311,6 +334,7 @@ func C1G2RFControl() []byte {
 	return Pack(data)
 }
 
+// C1G2SingulationControl returns a C1G2_SINGULATION_CONTROL parameter with default population settings.
 func C1G2SingulationControl() []byte {
 	length := 11
 	var data = []interface{}{
@@ -323,7 +347,7 @@ func C1G2SingulationControl() []byte {
 	return Pack(data)
 }
 
-// UHFCapabilities :
+// UHFCapabilities returns a UHF_CAPABILITIES parameter for the specified antenna count.
 func UHFCapabilities(numOfAntennas int) []byte {
 	numOfPowerLevel := 81
 	length := 1189 //numOfPowerLevel*8 + 213 + 324 + 4 //transmitpowerlevel + freqinfo + c1g2 + type + length
@@ -341,7 +365,7 @@ func UHFCapabilities(numOfAntennas int) []byte {
 	return x
 }
 
-//TransmitPowerLevelEntry :
+// TransmitPowerLevelEntry returns a TRANSMIT_POWER_LEVEL_ENTRY parameter with the supplied values.
 func TransmitPowerLevelEntry(id uint16, powerLevel uint16) []byte {
 	var data = []interface{}{
 		uint16(145),        //type
@@ -352,7 +376,7 @@ func TransmitPowerLevelEntry(id uint16, powerLevel uint16) []byte {
 	return Pack(data)
 }
 
-//FrequencyInformation :
+// FrequencyInformation returns a FREQUENCY_INFORMATION parameter for the default hop table.
 func FrequencyInformation() []byte {
 	length := 213 //2 + 2 + 1 + 208
 	var data = []interface{}{
@@ -365,7 +389,7 @@ func FrequencyInformation() []byte {
 	return x
 }
 
-//FrequencyHopTable :
+// FrequencyHopTable returns a FREQUENCY_HOP_TABLE parameter populated with sample hop frequencies.
 func FrequencyHopTable() []byte {
 	numOfHops := 50
 	length := 208 //2 + 2 + 1 + 1 + 2 + numOfHops*4
@@ -390,7 +414,7 @@ func frequency(frequency int) []byte {
 	return Pack(data)
 }
 
-//C1G2UHFModeRFTable :
+// C1G2UHFModeRFTable returns a C1G2_UHF_MODE_RF_TABLE parameter with predefined mode entries.
 func C1G2UHFModeRFTable() []byte {
 
 	length := 324 //2 + 2 + 32*10
@@ -412,7 +436,7 @@ func C1G2UHFModeRFTable() []byte {
 	return x
 }
 
-//C1G2UHFModeRFTableEntry :
+// C1G2UHFModeRFTableEntry returns a C1G2_UHF_MODE_RF_TABLE_ENTRY parameter for the given mode identifier.
 func C1G2UHFModeRFTableEntry(mode int) []byte {
 	var data = []interface{}{
 		uint16(329),    //type

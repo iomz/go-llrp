@@ -32,8 +32,10 @@ const (
 	ReaderEventNotificationHeader     = 1087 // type 63
 	EventsAndReportsHeader            = 1088 // type 64
 	KeepaliveAckHeader                = 1096 // type 72
-	ImpinjEnableCutomMessageHeader    = 2047 // type 1023
+	ImpinjEnableCustomMessageHeader   = 2047 // type 1023
 )
+
+const ImpinjEnableCutomMessageHeader = ImpinjEnableCustomMessageHeader
 
 // Pack the data into (partial) LLRP packet payload.
 // TODO: count the data size and return resulting length ?
